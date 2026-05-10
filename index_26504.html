@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RPI팀 협력사 방문앱</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI";
+      margin: 0;
+      background: #f9fafb;
+    }
+    .wrap { max-width: 1200px; margin: auto; padding: 20px; }
+    h1 { margin: 6px 0 14px; font-size: 22px; }
+    h2 { margin: 0 0 10px; font-size: 16px; }
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 1px 6px rgba(0,0,0,.04);
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .row3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    label { font-size: 12px; color: #555; display: block; margin-bottom: 6px; }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+    }
+    button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #2563eb;
+      color: #fff;
+    }
+    button.secondary { background: #111827; }
+    button.ghost {
+      background: #fff;
+      color: #111827;
+      border: 1px solid #d1d5db;
+    }
+    .kpi .value { font-size: 22px; font-weight: 800; }
+    .kpi .label { font-size: 12px; color: #6b7280; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 8px 6px; border-bottom: 1px solid #eee; text-align: left; }
+    .muted { font-size: 12px; color: #6b7280; }
+
+    /* ✅ 요약 2분할 */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .summary {
+      white-space: pre-wrap;
+      line-height: 1.5;
+      font-size: 13px;
+      background: #f9fafb;
+      border: 1px dashed #d1d5db;
+      border-radius: 12px;
+      padding: 12px;
+      min-height: 120px;
+    }
+    .summary-title {
+      font-size: 12px;
+      color: #111827;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .summary-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+    @media (max-width: 900px) {
+      .row, .row3 { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <h1>RPI팀 협력사 방문앱</h1>
+  <div class="muted">※ 데이터는 브라우저(LocalStorage)에 저장됩니다.</div>
+
+  <!-- ✅ 요약 카드: 협력사 선택과 무관 (전체 데이터 기준) -->
+  <div class="card" style="margin-top:12px;">
+    <h2 style="margin-bottom:8px;">요약</h2>
+
+    <div class="summary-actions">
+      <button id="summaryBtn" class="secondary">요약</button>
+      <button id="copyLatestBtn" class="ghost">왼쪽(최근1건) 복사</button>
+      <button id="copyRecentBtn" class="ghost">오른쪽(최근10건) 복사</button>
+    </div>
+
+    <div class="summary-grid">
+      <div>
+        <div class="summary-title">최근 등록 1건</div>
+        <div id="summaryLatestBox" class="summary muted">요약 버튼을 누르면 최근 등록 1건이 표시됩니다.</div>
+      </div>
+      <div>
+        <div class="summary-title">최근 등록 10건</div>
+        <div id="summaryRecentBox" class="summary muted">요약 버튼을 누르면 최근 등록 10건이 표시됩니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:12px;">
+    <div class="card">
+      <h2>방문 기록 추가</h2>
+      <div class="row">
+        <div>
+          <label>협력사명</label>
+          <input id="vendorName" placeholder="A사" />
+        </div>
+        <div>
+          <label>방문일</label>
+          <input id="visitDate" type="date" />
+        </div>
+        <div>
+          <label>담당자</label>
+          <input id="managerName" placeholder="정우" />
+        </div>
+        <div>
+          <label>방문자</label>
+          <input id="visitorName" placeholder="김방문" />
+        </div>
+
+        <div>
+          <label>회의 목적</label>
+          <select id="meetingPurpose">
+            <option value="">선택하세요</option>
+            <option>단가 협의</option>
+            <option>품질 이슈</option>
+            <option>신규 개발</option>
+            <option>기타</option>
+          </select>
+        </div>
+
+        <div>
+          <label>목적 상세 내용</label>
+          <input id="meetingDetail" placeholder="자유 기재" />
+        </div>
+      </div>
+
+      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button id="addBtn">추가</button>
+        <button class="ghost" id="seedBtn">샘플 데이터</button>
+        <button class="ghost" id="clearBtn">전체 삭제</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>협력사 선택</h2>
+      <select id="vendorSelect"></select>
+
+      <div class="row3" style="margin-top:12px;">
+        <div class="card kpi">
+          <div class="label">총 방문 횟수</div>
+          <div class="value" id="kpiTotal">0</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">담당자 수</div>
+          <div class="value" id="kpiManagers">0</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">회의 목적 종류</div>
+          <div class="value" id="kpiPurposes">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:12px;">
+    <div class="card" style="height:360px;">
+      <h2>월별 방문 추이</h2>
+      <canvas id="monthlyChart"></canvas>
+    </div>
+    <div class="card" style="height:360px;">
+      <h2>목적 분포</h2>
+      <canvas id="purposeChart"></canvas>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px;">
+    <h2>최근 방문 10건</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>날짜</th>
+          <th>담당자</th>
+          <th>방문자</th>
+          <th>회의 목적</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="recentBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const KEY = "visits_data";
+const $ = id => document.getElementById(id);
+const load = () => JSON.parse(localStorage.getItem(KEY) || "[]");
+const save = d => localStorage.setItem(KEY, JSON.stringify(d));
+const uid = () => "v_" + Math.random().toString(16).slice(2);
+
+let monthlyChart, purposeChart;
+
+/* ===========================
+   ✅ 요약 포맷 함수
+   "최근 등록" 기준 = 저장 배열의 마지막(push된) 순서 기준
+=========================== */
+function formatOne(v){
+  if(!v) return "표시할 방문 내역이 없습니다.";
+  const detail = (v.meetingDetail||"").trim();
+  return [
+    `- 방문자: ${v.visitorName || "-"}`,
+    `- 방문일정: ${v.visitDate || "-"}`,
+    `- 방문협력사: ${v.vendorName || "-"}`,
+    `- 방문사유: ${v.meetingPurpose || "-"}`,
+    `- 내용: ${detail ? detail : "-"}`,
+  ].join("\n");
+}
+
+function formatMany(list){
+  if(!list || list.length === 0) return "표시할 방문 내역이 없습니다.";
+  return list.map(v => formatOne(v) + "\n").join("\n");
+}
+
+function renderSummary(){
+  const visits = load(); // ✅ 협력사 선택과 무관하게 전체 기준
+
+  // 최근 등록 1건 = 마지막 1개
+  const latest = visits.length ? visits[visits.length - 1] : null;
+
+  // 최근 등록 10건 = 마지막 10개를 최신이 위로 오도록 reverse
+  const recent10 = visits.slice(-10).reverse();
+
+  $("summaryLatestBox").textContent = formatOne(latest);
+  $("summaryLatestBox").classList.remove("muted");
+
+  $("summaryRecentBox").textContent = formatMany(recent10);
+  $("summaryRecentBox").classList.remove("muted");
+}
+
+$("summaryBtn").onclick = () => {
+  renderSummary();
+};
+
+/* ✅ 복사 버튼(좌/우 따로) */
+async function copyText(text){
+  if(!text.trim()) return alert("복사할 내용이 없습니다.");
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("복사되었습니다.");
+  } catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    alert("복사되었습니다.");
+  }
+}
+
+$("copyLatestBtn").onclick = () => copyText($("summaryLatestBox").textContent || "");
+$("copyRecentBtn").onclick = () => copyText($("summaryRecentBox").textContent || "");
+
+/* ===========================
+   ✅ 기존 기능
+=========================== */
+function refresh() {
+  const visits = load();
+  const vendors = [...new Set(visits.map(v=>v.vendorName))];
+  $("vendorSelect").innerHTML =
+    '<option value="">협력사 선택</option>' +
+    vendors.map(v=>`<option>${v}</option>`).join("");
+}
+
+function renderVendor(vendor) {
+  const visits = load().filter(v=>v.vendorName===vendor);
+  const byPurpose = {}, monthly = {};
+
+  visits.forEach(v=>{
+    byPurpose[v.meetingPurpose]=(byPurpose[v.meetingPurpose]||0)+1;
+    const m=v.visitDate.slice(0,7);
+    monthly[m]=(monthly[m]||0)+1;
+  });
+
+  $("kpiTotal").textContent = visits.length;
+  $("kpiManagers").textContent = new Set(visits.map(v=>v.managerName)).size;
+  $("kpiPurposes").textContent = Object.keys(byPurpose).length;
+
+  if (monthlyChart) monthlyChart.destroy();
+  monthlyChart = new Chart($("monthlyChart"), {
+    type:"line",
+    data:{labels:Object.keys(monthly), datasets:[{data:Object.values(monthly)}]},
+    options:{responsive:true, maintainAspectRatio:false}
+  });
+
+  if (purposeChart) purposeChart.destroy();
+  purposeChart = new Chart($("purposeChart"), {
+    type:"bar",
+    data:{labels:Object.keys(byPurpose), datasets:[{data:Object.values(byPurpose)}]},
+    options:{responsive:true, maintainAspectRatio:false}
+  });
+
+  $("recentBody").innerHTML =
+    visits.slice(-10).reverse().map(v=>`
+      <tr>
+        <td>${v.visitDate}</td>
+        <td>${v.managerName}</td>
+        <td>${v.visitorName}</td>
+        <td>
+          <b>${v.meetingPurpose}</b><br/>
+          <span class="muted">${v.meetingDetail||""}</span>
+        </td>
+        <td><button class="ghost" onclick="del('${v.id}')">삭제</button></td>
+      </tr>
+    `).join("");
+}
+
+function del(id){
+  save(load().filter(v=>v.id!==id));
+  refresh();
+
+  const currentVendor = $("vendorSelect").value;
+  if(currentVendor) renderVendor(currentVendor);
+}
+
+$("vendorSelect").onchange = e => renderVendor(e.target.value);
+
+$("addBtn").onclick = ()=>{
+  const v={
+    id:uid(),
+    vendorName:$("vendorName").value,
+    visitDate:$("visitDate").value,
+    managerName:$("managerName").value,
+    visitorName:$("visitorName").value,
+    meetingPurpose:$("meetingPurpose").value,
+    meetingDetail:$("meetingDetail").value
+  };
+  if(!v.vendorName||!v.visitDate||!v.managerName||!v.visitorName||!v.meetingPurpose)
+    return alert("모두 입력하세요.");
+  const visits=load(); visits.push(v); save(visits);
+  refresh();
+
+  const currentVendor = $("vendorSelect").value;
+  if(currentVendor) renderVendor(currentVendor);
+
+  // ✅ 원하면: 추가 시 자동으로 요약도 갱신
+  // renderSummary();
+};
+
+$("seedBtn").onclick=()=>{
+  const visits = load();
+  visits.push(
+    {id:uid(),vendorName:"A사",visitDate:"2026-04-01",managerName:"정우",visitorName:"김방문",meetingPurpose:"단가 협의",meetingDetail:"원자재 단가"},
+    {id:uid(),vendorName:"A사",visitDate:"2026-04-12",managerName:"정우",visitorName:"박방문",meetingPurpose:"품질 이슈",meetingDetail:"불량률 개선 논의"},
+    {id:uid(),vendorName:"B사",visitDate:"2026-05-01",managerName:"민수",visitorName:"김방문",meetingPurpose:"신규 개발",meetingDetail:"시제품 일정 협의"}
+  );
+  save(visits);
+  refresh();
+};
+
+$("clearBtn").onclick=()=>{
+  if(confirm("전체 삭제?")){
+    localStorage.removeItem(KEY);
+    refresh();
+
+    $("kpiTotal").textContent = "0";
+    $("kpiManagers").textContent = "0";
+    $("kpiPurposes").textContent = "0";
+    $("recentBody").innerHTML = "";
+
+    if (monthlyChart) { monthlyChart.destroy(); monthlyChart = null; }
+    if (purposeChart) { purposeChart.destroy(); purposeChart = null; }
+
+    $("summaryLatestBox").textContent = "요약 버튼을 누르면 최근 등록 1건이 표시됩니다.";
+    $("summaryLatestBox").classList.add("muted");
+    $("summaryRecentBox").textContent = "요약 버튼을 누르면 최근 등록 10건이 표시됩니다.";
+    $("summaryRecentBox").classList.add("muted");
+  }
+};
+
+refresh();
+</script>
+</body>
+</html>
