@@ -1,365 +1,147 @@
-
-import React, { useMemo, useState } from "react";
-
-export default function App() {
-  const html = useMemo(() => `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RPI 협력사 방문 관리</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RPI 협력사 방문 관리</title>
 
-  <style>
-    body{font-family:system-ui,-apple-system,"Noto Sans KR","Malgun Gothic";background:#0b1220;color:#e9eefc;margin:0}
-    h1{margin:0;font-size:20px}
-    .wrap{max-width:1100px;margin:auto;padding:16px}
-    .card{background:#101a33;border-radius:14px;padding:14px;margin-bottom:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    label{display:block;margin-top:10px;font-size:12px;color:#9fb0d0}
-    input,select,textarea{width:100%;border-radius:12px;background:#00000030;color:#e9eefc;border:1px solid rgba(255,255,255,.12);padding:10px;font-size:14px;box-sizing:border-box;outline:none}
-    input::placeholder{color:#7f93b8}
-    .input-tall{height:96px;padding-top:14px;padding-bottom:14px}
-    .select-tall{height:96px}
-    button{background:#4da3ff;color:#081122;border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
-    button:hover{filter:brightness(1.05)}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    th,td{border-bottom:1px solid rgba(255,255,255,.12);padding:8px;font-size:12px;vertical-align:top}
-    th{text-align:left;color:#cfe6ff}
-    .tag{background:#4da3ff33;padding:2px 8px;border-radius:999px}
-    .hint{font-size:12px;color:#9fb0d0;margin:6px 0 0}
-    .warn{background:#ffcc0022;border:1px solid rgba(255,204,0,.35);color:#ffeaa0;padding:10px 12px;border-radius:12px;margin:12px 0;font-size:12px;line-height:1.4}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media (max-width:860px){.grid{grid-template-columns:1fr}}
-    .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
-    .kpi .box{background:#0b1430;border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:10px}
-    .kpi .t{font-size:11px;color:#9fb0d0}
-    .kpi .v{font-size:18px;font-weight:800;margin-top:4px}
-    canvas{background:#0b1430;border-radius:12px;border:1px solid rgba(255,255,255,.10)}
-  </style>
+<style>
+body{
+  font-family:system-ui,-apple-system,"Noto Sans KR","Malgun Gothic";
+  background:#0b1220; color:#e9eefc; margin:0;
+}
+h1{margin:0;font-size:20px}
+.wrap{max-width:1100px;margin:auto;padding:16px}
+.card{
+  background:#101a33;border-radius:14px;
+  padding:14px;margin-bottom:16px;
+}
+label{font-size:12px;color:#9fb0d0}
+input,select,textarea{
+  width:100%;border-radius:12px;
+  background:#00000030;color:#e9eefc;
+  border:1px solid rgba(255,255,255,.12);
+  padding:10px;font-size:14px;
+}
+.input-tall{height:96px;padding-top:14px;padding-bottom:14px}
+.select-tall{height:96px}
+button{
+  background:#4da3ff;color:#081122;
+  border:0;border-radius:12px;
+  padding:10px 14px;font-weight:700;
+  cursor:pointer;
+}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border-bottom:1px solid rgba(255,255,255,.12);padding:8px;font-size:12px}
+th{text-align:left;color:#cfe6ff}
+.tag{background:#4da3ff33;padding:2px 8px;border-radius:999px}
+</style>
 </head>
 
 <body>
-  <div class="wrap">
-    <h1>RPI 협력사 방문 관리</h1>
-    <p class="hint">※ 데이터는 브라우저 LocalStorage(<b>visits_data</b>)에 저장됩니다</p>
+<div class="wrap">
 
-    <div id="storageWarn" class="warn" style="display:none;">
-      현재 브라우저 환경에서 LocalStorage 접근이 차단되어 저장/조회가 안 될 수 있습니다.
-      (사내 보안 설정/프라이빗 모드/추적방지 옵션 등)<br/>
-      해결: 일반 모드 크롬/엣지에서 열거나, 사이트 저장소 차단을 해제하세요.
-    </div>
+<h1>RPI 협력사 방문 관리</h1>
+<p style="font-size:12px;color:#9fb0d0">
+※ 데이터는 브라우저 LocalStorage(visits_data)에 저장됩니다
+</p>
 
-    <div id="chartWarn" class="warn" style="display:none;">
-      차트 라이브러리(Chart.js) 로드에 실패했습니다.<br/>
-      해결(권장): 사내망/정책으로 CDN이 차단되면 차트가 보이지 않을 수 있습니다.
-    </div>
+<div class="card">
+<h2 style="font-size:14px">방문 기록 추가</h2>
 
-    <div class="card">
-      <h2 style="font-size:14px;margin:0 0 6px;">방문 기록 추가</h2>
+<label>협력사명</label>
+<input id="vendorName" class="input-tall" placeholder="예) 경동나비엔">
 
-      <label for="vendorName">협력사명</label>
-      <input id="vendorName" class="input-tall" placeholder="예) 경동나비엔" />
+<label>방문일</label>
+<input id="visitDate" type="date">
 
-      <label for="visitDate">방문일</label>
-      <input id="visitDate" type="date" />
+<label>담당자</label>
+<input id="managerName" class="input-tall" placeholder="예) 조현준">
 
-      <label for="managerName">담당자</label>
-      <input id="managerName" class="input-tall" placeholder="예) 조현준" />
+<label>방문자</label>
+<input id="visitorName" placeholder="예) 김정우,이정수">
 
-      <label for="visitorName">방문자</label>
-      <input id="visitorName" placeholder="예) 김정우,이정수" />
+<label>회의 목적</label>
+<select id="meetingPurpose" class="select-tall">
+  <option>단가 협의</option>
+  <option>신규 개발</option>
+  <option>품질 협의</option>
+  <option selected>기타</option>
+</select>
 
-      <label for="meetingPurpose">회의 목적</label>
-      <select id="meetingPurpose" class="select-tall">
-        <option>단가 협의</option>
-        <option>신규 개발</option>
-        <option>품질 협의</option>
-        <option selected>기타</option>
-      </select>
+<label>목적 상세</label>
+<input id="detailShort" placeholder="예) 공정 라인 확인">
 
-      <label for="detailShort">목적 상세</label>
-      <input id="detailShort" placeholder="예) 공정 라인 확인" />
+<br><br>
+<button id="addBtn">추가</button>
+</div>
 
-      <br /><br />
-      <button id="addBtn" type="button">추가</button>
+<div class="card">
+<h2 style="font-size:14px">최근 방문</h2>
+<table>
+<thead>
+<tr>
+<th>날짜</th><th>담당자</th><th>협력사</th>
+<th>방문자</th><th>목적</th><th>내용</th>
+</tr>
+</thead>
+<tbody id="list"></tbody>
+</table>
+</div>
 
-      <div class="kpi" style="margin-top:14px;">
-        <div class="box">
-          <div class="t">총 방문 수</div>
-          <div class="v" id="kpiTotal">0</div>
-        </div>
-        <div class="box">
-          <div class="t">협력사 수(유니크)</div>
-          <div class="v" id="kpiVendors">0</div>
-        </div>
-        <div class="box">
-          <div class="t">마지막 방문일</div>
-          <div class="v" id="kpiLast">-</div>
-        </div>
-      </div>
-    </div>
+</div>
 
-    <div class="card">
-      <h2 style="font-size:14px;margin:0 0 10px;">방문 통계 그래프</h2>
-      <div class="grid">
-        <div>
-          <div class="hint" style="margin:0 0 6px;">월별 방문 횟수</div>
-          <canvas id="chartMonthly" height="280"></canvas>
-        </div>
-        <div>
-          <div class="hint" style="margin:0 0 6px;">담당자별 방문 횟수 (TOP 10)</div>
-          <canvas id="chartManager" height="280"></canvas>
-        </div>
-      </div>
-    </div>
+<script>
+(function(){
+  const KEY = 'visits_data';
 
-    <div class="card">
-      <h2 style="font-size:14px;margin:0 0 6px;">최근 방문</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>날짜</th><th>담당자</th><th>협력사</th>
-            <th>방문자</th><th>목적</th><th>내용</th>
-          </tr>
-        </thead>
-        <tbody id="list"></tbody>
-      </table>
-    </div>
-  </div>
+  const $ = id => document.getElementById(id);
 
-  <!-- CDN 로드 (프리뷰에서는 로컬 파일 경로가 없어 CDN만 사용) -->
-  https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js
+  function load(){
+    try{ return JSON.parse(localStorage.getItem(KEY))||[]; }
+    catch(e){ return []; }
+  }
+  function save(a){
+    localStorage.setItem(KEY, JSON.stringify(a));
+  }
 
-  <script>
-    (function () {
-      const KEY = 'visits_data';
-      const $ = (id) => document.getElementById(id);
+  function render(){
+    const list = load().sort((a,b)=>b.date.localeCompare(a.date));
+    const body = $('list');
+    body.innerHTML='';
+    list.slice(0,10).forEach(v=>{
+      body.insertAdjacentHTML('beforeend',`
+        <tr>
+          <td>${v.date}</td>
+          <td>${v.manager}</td>
+          <td><span class="tag">${v.vendor}</span></td>
+          <td>${v.visitors}</td>
+          <td>${v.purpose}</td>
+          <td>${v.detail}</td>
+        </tr>
+      `);
+    });
+  }
 
-      let monthlyChart = null;
-      let managerChart = null;
+  $('addBtn').onclick = function(){
+    if(!$('vendorName').value || !$('visitDate').value){
+      alert('협력사명과 방문일은 필수입니다'); return;
+    }
+    const a = load();
+    a.push({
+      vendor:$('vendorName').value,
+      date:$('visitDate').value,
+      manager:$('managerName').value,
+      visitors:$('visitorName').value,
+      purpose:$('meetingPurpose').value,
+      detail:$('detailShort').value
+    });
+    save(a); render();
+  };
 
-      function storageAvailable() {
-        try {
-          const t = '__test__';
-          localStorage.setItem(t, '1');
-          localStorage.removeItem(t);
-          return true;
-        } catch (e) {
-          return false;
-        }
-      }
+  render();
+})();
+</script>
 
-      if (!storageAvailable()) {
-        $('storageWarn').style.display = 'block';
-      }
-
-      function load() {
-        try { return JSON.parse(localStorage.getItem(KEY)) || []; }
-        catch (e) { return []; }
-      }
-
-      function save(arr) {
-        localStorage.setItem(KEY, JSON.stringify(arr));
-      }
-
-      function esc(s) {
-        return String(s ?? '')
-          .replaceAll('&', '&amp;')
-          .replaceAll('<', '&lt;')
-          .replaceAll('>', '&gt;')
-          .replaceAll('"', '&quot;')
-          .replaceAll("'", '&#39;');
-      }
-
-      function ym(dateStr){
-        if(!dateStr || dateStr.length < 7) return '';
-        return dateStr.slice(0,7);
-      }
-
-      function computeStats(arr){
-        const total = arr.length;
-        const vendorSet = new Set(arr.map(v => (v.vendor || '').trim()).filter(Boolean));
-        const last = arr.map(v => v.date).filter(Boolean).sort().pop() || '-';
-
-        const monthly = new Map();
-        const manager = new Map();
-
-        for (const v of arr) {
-          const m = ym(v.date);
-          if (m) monthly.set(m, (monthly.get(m) || 0) + 1);
-
-          const mg = (v.manager || '').trim() || '(미입력)';
-          manager.set(mg, (manager.get(mg) || 0) + 1);
-        }
-
-        const monthlyLabels = Array.from(monthly.keys()).sort();
-        const monthlyData = monthlyLabels.map(k => monthly.get(k));
-
-        const managerPairs = Array.from(manager.entries()).sort((a,b)=>b[1]-a[1]).slice(0,10);
-        const managerLabels = managerPairs.map(p=>p[0]);
-        const managerData = managerPairs.map(p=>p[1]);
-
-        return { total, vendorCount: vendorSet.size, last, monthlyLabels, monthlyData, managerLabels, managerData };
-      }
-
-      function renderList() {
-        const list = load().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-        const body = $('list');
-        body.innerHTML = '';
-
-        list.slice(0, 10).forEach(v => {
-          body.insertAdjacentHTML('beforeend', `
-            <tr>
-              <td>${esc(v.date)}</td>
-              <td>${esc(v.manager)}</td>
-              <td><span class=\"tag\">${esc(v.vendor)}</span></td>
-              <td>${esc(v.visitors)}</td>
-              <td>${esc(v.purpose)}</td>
-              <td>${esc(v.detail)}</td>
-            </tr>
-          `);
-        });
-      }
-
-      function renderKPI(stats){
-        $('kpiTotal').textContent = stats.total;
-        $('kpiVendors').textContent = stats.vendorCount;
-        $('kpiLast').textContent = stats.last;
-      }
-
-      function renderCharts(stats){
-        if (!window.Chart) {
-          $('chartWarn').style.display = 'block';
-          return;
-        } else {
-          $('chartWarn').style.display = 'none';
-        }
-
-        const common = {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: '#cfe6ff' } }
-          },
-          scales: {
-            x: { ticks: { color: '#9fb0d0' }, grid: { color: 'rgba(255,255,255,.06)' } },
-            y: { ticks: { color: '#9fb0d0' }, grid: { color: 'rgba(255,255,255,.06)' }, beginAtZero: true }
-          }
-        };
-
-        const ctxM = document.getElementById('chartMonthly').getContext('2d');
-        if (monthlyChart) monthlyChart.destroy();
-        monthlyChart = new Chart(ctxM, {
-          type: 'bar',
-          data: {
-            labels: stats.monthlyLabels,
-            datasets: [{
-              label: '방문 횟수',
-              data: stats.monthlyData,
-              backgroundColor: 'rgba(77,163,255,0.45)',
-              borderColor: 'rgba(77,163,255,0.9)',
-              borderWidth: 1
-            }]
-          },
-          options: common
-        });
-
-        const ctxG = document.getElementById('chartManager').getContext('2d');
-        if (managerChart) managerChart.destroy();
-        managerChart = new Chart(ctxG, {
-          type: 'bar',
-          data: {
-            labels: stats.managerLabels,
-            datasets: [{
-              label: '방문 횟수',
-              data: stats.managerData,
-              backgroundColor: 'rgba(120,255,205,0.30)',
-              borderColor: 'rgba(120,255,205,0.85)',
-              borderWidth: 1
-            }]
-          },
-          options: common
-        });
-      }
-
-      function renderAll(){
-        const arr = load();
-        const stats = computeStats(arr);
-        renderKPI(stats);
-        renderList();
-        renderCharts(stats);
-      }
-
-      $('addBtn').onclick = function () {
-        const vendor = $('vendorName').value.trim();
-        const date = $('visitDate').value;
-
-        if (!vendor || !date) {
-          alert('협력사명과 방문일은 필수입니다');
-          return;
-        }
-
-        const arr = load();
-        arr.push({
-          vendor,
-          date,
-          manager: $('managerName').value.trim(),
-          visitors: $('visitorName').value.trim(),
-          purpose: $('meetingPurpose').value,
-          detail: $('detailShort').value.trim()
-        });
-
-        save(arr);
-        $('detailShort').value = '';
-        renderAll();
-      };
-
-      renderAll();
-    })();
-  </script>
 </body>
 </html>
-`, []);
-
-  const [full, setFull] = useState(false);
-
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4">
-      <div className="max-w-6xl mx-auto grid gap-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-xl font-bold">미리보기</h1>
-            <p className="text-sm text-slate-300 mt-1">
-              아래 iframe은 <span className="font-mono">srcDoc</span>으로 렌더링됩니다. 이 프리뷰는 로컬스토리지를 사용하므로 레코드는 이 프리뷰 iframe 내부에 저장됩니다.
-            </p>
-          </div>
-          <button
-            className="px-3 py-2 rounded-xl bg-sky-500 text-slate-950 font-bold hover:brightness-105"
-            onClick={() => setFull(v => !v)}
-          >
-            {full ? "코드 숨기기" : "코드 보기"}
-          </button>
-        </div>
-
-        {full && (
-          <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-3 overflow-auto">
-            <pre className="text-xs leading-relaxed whitespace-pre-wrap break-words text-slate-200">{html}</pre>
-          </div>
-        )}
-
-        <div className="rounded-2xl overflow-hidden border border-white/10 bg-black">
-          <iframe
-            title="RPI Preview"
-            srcDoc={html}
-            sandbox="allow-scripts allow-forms allow-same-origin"
-            className="w-full"
-            style={{ height: "78vh" }}
-          />
-        </div>
-
-        <div className="text-xs text-slate-400">
-          * 참고: 회사/브라우저 정책에 따라 CDN이 차단되면 차트가 안 보일 수 있습니다. GitHub Pages에서는 Chart.js를 저장소에 함께 올려 로컬로 로드하는 구성이 가장 안정적입니다.
-        </div>
-      </div>
-    </div>
-  );
-}
