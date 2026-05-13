@@ -1,234 +1,146 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RPI팀 협력사 방문앱</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RPI 협력사 방문 관리</title>
 
 <style>
-:root{
-  --bg:#0b1220; --card:#101a33; --card2:#0f1830;
-  --text:#e9eefc; --muted:#9fb0d0;
-  --accent:#4da3ff; --danger:#ff5c7a;
-  --line:rgba(255,255,255,.12);
-  --radius:14px;
-}
-*{box-sizing:border-box}
 body{
-  margin:0; color:var(--text);
   font-family:system-ui,-apple-system,"Noto Sans KR","Malgun Gothic";
-  background:var(--bg);
-}
-header{
-  padding:16px 20px; border-bottom:1px solid var(--line);
-  background:#0b1220cc; backdrop-filter:blur(8px);
+  background:#0b1220; color:#e9eefc; margin:0;
 }
 h1{margin:0;font-size:20px}
-.sub{font-size:12px;color:var(--muted);margin-top:6px}
-.maker{font-size:12px;color:var(--muted);text-align:right}
-
-main{max-width:1100px;margin:auto;padding:16px}
-.grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:16px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
-
+.wrap{max-width:1100px;margin:auto;padding:16px}
 .card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  padding:14px;
+  background:#101a33;border-radius:14px;
+  padding:14px;margin-bottom:16px;
 }
-.card h2{margin:0 0 10px;font-size:14px}
-
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:600px){.row{grid-template-columns:1fr}}
-
-label{font-size:12px;color:var(--muted)}
+label{font-size:12px;color:#9fb0d0}
 input,select,textarea{
-  width:100%; border-radius:12px;
-  background:#00000030; color:var(--text);
-  border:1px solid var(--line);
-  padding:10px;
-  font-size:14px;
+  width:100%;border-radius:12px;
+  background:#00000030;color:#e9eefc;
+  border:1px solid rgba(255,255,255,.12);
+  padding:10px;font-size:14px;
 }
-
-/* ✅ 요청 반영: 세로 3배 입력칸 */
-.input-tall, .select-tall{
-  height:96px;
-  padding-top:14px;
-  padding-bottom:14px;
-}
-
-/* 기타 */
-textarea{min-height:90px}
+.input-tall{height:96px;padding-top:14px;padding-bottom:14px}
+.select-tall{height:96px}
 button{
-  border-radius:12px;border:0;
-  padding:10px 12px;
-  background:var(--accent);
-  cursor:pointer;font-weight:700
+  background:#4da3ff;color:#081122;
+  border:0;border-radius:12px;
+  padding:10px 14px;font-weight:700;
+  cursor:pointer;
 }
-button.secondary{background:#ffffff20;color:var(--text)}
-button.danger{background:var(--danger);color:#fff}
-
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-
 table{width:100%;border-collapse:collapse;margin-top:10px}
-th,td{border-bottom:1px solid var(--line);padding:8px;font-size:12px}
-th{color:#cfe6ff;text-align:left}
-.tag{background:#4da3ff30;padding:3px 8px;border-radius:999px}
-
+th,td{border-bottom:1px solid rgba(255,255,255,.12);padding:8px;font-size:12px}
+th{text-align:left;color:#cfe6ff}
+.tag{background:#4da3ff33;padding:2px 8px;border-radius:999px}
 </style>
 </head>
 
 <body>
+<div class="wrap">
 
-<header>
-  <div style="display:flex;justify-content:space-between;gap:12px;">
-    <div>
-      <h1>RPI팀 협력사 방문앱</h1>
-      <div class="sub">
-        ※ 데이터는 브라우저 LocalStorage(visits_data)에 저장됩니다
-      </div>
-    </div>
-    <div class="maker">만든이 : RPI팀 김정우 팀장</div>
-  </div>
-</header>
+<h1>RPI 협력사 방문 관리</h1>
+<p style="font-size:12px;color:#9fb0d0">
+※ 데이터는 브라우저 LocalStorage(visits_data)에 저장됩니다
+</p>
 
-<main>
-<div class="grid">
+<div class="card">
+<h2 style="font-size:14px">방문 기록 추가</h2>
 
-<!-- ✅ 입력 영역 -->
-<section class="card">
-<h2>방문 기록 추가</h2>
+<label>협력사명</label>
+<input id="vendorName" class="input-tall" placeholder="예) 경동나비엔">
 
-<div class="row">
-
-<div>
-<label>협력사명 (수기 + 드롭다운)</label>
-<input id="vendorName" list="vendorList"
-       class="input-tall"
-       placeholder="예) 정민테크 (직접 입력 가능)" />
-<datalist id="vendorList"></datalist>
-</div>
-
-<div>
 <label>방문일</label>
-<input id="visitDate" type="date" />
-</div>
+<input id="visitDate" type="date">
 
-<div>
-<label>담당자 (수기 + 드롭다운)</label>
-<input id="managerName" list="managerList"
-       class="input-tall"
-       placeholder="예) 조현준 (직접 입력 가능)" />
-<datalist id="managerList"></datalist>
-</div>
+<label>담당자</label>
+<input id="managerName" class="input-tall" placeholder="예) 조현준">
 
-<div>
 <label>방문자</label>
-<input id="visitorName" placeholder="예) 김정우,이정수" />
-</div>
+<input id="visitorName" placeholder="예) 김정우,이정수">
 
-<div>
 <label>회의 목적</label>
 <select id="meetingPurpose" class="select-tall">
-  <option value="단가 협의">단가 협의</option>
-  <option value="신규 개발">신규 개발</option>
-  <option value="품질 협의">품질 협의</option>
-  <option value="기타" selected>기타</option>
+  <option>단가 협의</option>
+  <option>신규 개발</option>
+  <option>품질 협의</option>
+  <option selected>기타</option>
 </select>
-</div>
 
-<div>
 <label>목적 상세</label>
-<input id="meetingDetailShort" placeholder="예) 공정 라인 확인" />
+<input id="detailShort" placeholder="예) 공정 라인 확인">
+
+<br><br>
+<button id="addBtn">추가</button>
 </div>
 
-<div style="grid-column:1/-1">
-<label>메모</label>
-<textarea id="meetingDetail"></textarea>
-</div>
-
-</div>
-
-<div class="actions">
-  <button onclick="addVisit()">추가</button>
-  <button class="danger" onclick="clearAll()">전체 삭제</button>
-</div>
-</section>
-
-<!-- ✅ 최근 방문 -->
-<section class="card">
-<h2>최근 방문 10건</h2>
+<div class="card">
+<h2 style="font-size:14px">최근 방문</h2>
 <table>
 <thead>
 <tr>
-  <th>날짜</th><th>담당자</th><th>협력사</th>
-  <th>방문자</th><th>목적</th><th>내용</th>
+<th>날짜</th><th>담당자</th><th>협력사</th>
+<th>방문자</th><th>목적</th><th>내용</th>
 </tr>
 </thead>
-<tbody id="recentBody"></tbody>
+<tbody id="list"></tbody>
 </table>
-</section>
+</div>
 
 </div>
-</main>
 
 <script>
-const STORAGE_KEY='visits_data';
+(function(){
+  const KEY = 'visits_data';
 
-function load(){
-  return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
-}
-function save(arr){
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(arr));
-}
-function addVisit(){
-  const v={
-    id:'v_'+Date.now(),
-    vendorName:vendorName.value.trim(),
-    visitDate:visitDate.value,
-    managerName:managerName.value.trim(),
-    visitorName:visitorName.value.trim(),
-    meetingPurpose:meetingPurpose.value,
-    meetingDetailShort:meetingDetailShort.value.trim(),
-    meetingDetail:meetingDetail.value.trim(),
-    createdAt:Date.now()
-  };
-  if(!v.vendorName||!v.visitDate){alert('협력사명/방문일 필수');return;}
-  const arr=load(); arr.push(v); save(arr);
-  render();
-}
-function clearAll(){
-  if(confirm('전체 삭제?')){
-    localStorage.removeItem(STORAGE_KEY); render();
+  const $ = id => document.getElementById(id);
+
+  function load(){
+    try{ return JSON.parse(localStorage.getItem(KEY))||[]; }
+    catch(e){ return []; }
   }
-}
-function render(){
-  const arr=load();
-  arr.sort((a,b)=>b.visitDate.localeCompare(a.visitDate));
-  recentBody.innerHTML='';
-  arr.slice(0,10).forEach(v=>{
-    recentBody.innerHTML+=`
-      <tr>
-        <td>${v.visitDate}</td>
-        <td>${v.managerName}</td>
-        <td><span class="tag">${v.vendorName}</span></td>
-        <td>${v.visitorName}</td>
-        <td>${v.meetingPurpose}</td>
-        <td>${v.meetingDetailShort||''}</td>
-      </tr>`;
-  });
+  function save(a){
+    localStorage.setItem(KEY, JSON.stringify(a));
+  }
 
-  vendorList.innerHTML='';
-  [...new Set(arr.map(x=>x.vendorName))].forEach(x=>{
-    vendorList.innerHTML+=`<option value="${x}">`;
-  });
-  managerList.innerHTML='';
-  [...new Set(arr.map(x=>x.managerName))].forEach(x=>{
-    managerList.innerHTML+=`<option value="${x}">`;
-  });
-}
-render();
+  function render(){
+    const list = load().sort((a,b)=>b.date.localeCompare(a.date));
+    const body = $('list');
+    body.innerHTML='';
+    list.slice(0,10).forEach(v=>{
+      body.insertAdjacentHTML('beforeend',`
+        <tr>
+          <td>${v.date}</td>
+          <td>${v.manager}</td>
+          <td><span class="tag">${v.vendor}</span></td>
+          <td>${v.visitors}</td>
+          <td>${v.purpose}</td>
+          <td>${v.detail}</td>
+        </tr>
+      `);
+    });
+  }
+
+  $('addBtn').onclick = function(){
+    if(!$('vendorName').value || !$('visitDate').value){
+      alert('협력사명과 방문일은 필수입니다'); return;
+    }
+    const a = load();
+    a.push({
+      vendor:$('vendorName').value,
+      date:$('visitDate').value,
+      manager:$('managerName').value,
+      visitors:$('visitorName').value,
+      purpose:$('meetingPurpose').value,
+      detail:$('detailShort').value
+    });
+    save(a); render();
+  };
+
+  render();
+})();
 </script>
 
 </body>
