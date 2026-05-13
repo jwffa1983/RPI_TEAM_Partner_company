@@ -1,31 +1,23 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>RPI팀 협력사 방문앱</title>
 
 <style>
 :root{
-  --bg:#0b1220;
-  --card:#101a33;
-  --text:#e9eefc;
-  --muted:#9fb0d0;
-  --accent:#4da3ff;
-  --danger:#ff5c7a;
-  --line:rgba(255,255,255,.12);
-  --radius:14px;
+  --bg:#0b1220; --card:#101a33; --text:#e9eefc;
+  --muted:#9fb0d0; --accent:#4da3ff; --danger:#ff5c7a;
+  --line:rgba(255,255,255,.12); --radius:14px;
 }
 *{box-sizing:border-box}
 body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
+  margin:0; background:var(--bg); color:var(--text);
   font-family:system-ui,-apple-system,"Noto Sans KR","Malgun Gothic";
 }
 header{
-  padding:16px 20px;
-  border-bottom:1px solid var(--line);
+  padding:16px 20px; border-bottom:1px solid var(--line);
 }
 h1{margin:0;font-size:20px}
 .sub{font-size:12px;color:var(--muted);margin-top:6px}
@@ -36,98 +28,42 @@ main{max-width:1100px;margin:auto;padding:16px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
 
 .card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  padding:14px;
+  background:var(--card); border:1px solid var(--line);
+  border-radius:var(--radius); padding:14px;
 }
 .card h2{margin:0 0 10px;font-size:14px}
 
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:600px){.row{grid-template-columns:1fr}}
 
-label{
-  font-size:12px;
-  color:var(--muted);
-  display:block;
-  margin-bottom:4px;
-}
+label{font-size:12px;color:var(--muted);margin-bottom:4px;display:block}
 input,textarea,select{
-  width:100%;
-  border-radius:12px;
-  background:#00000030;
-  color:var(--text);
-  border:1px solid var(--line);
-  padding:10px;
-  font-size:14px;
+  width:100%; border-radius:12px; border:1px solid var(--line);
+  background:#00000030; color:var(--text);
+  padding:10px; font-size:14px;
 }
 
-/* ✅ 세로 3배 입력칸 */
-.input-tall{
-  height:96px;
-  padding-top:14px;
-  padding-bottom:14px;
-}
-
-/* ✅ select 전용 확장 (회의 목적) */
+/* 세로 3배 */
+.input-tall{height:96px;padding-top:14px;padding-bottom:14px}
 .select-tall{
-  height:96px;
-  padding-top:14px;
-  padding-bottom:14px;
-  line-height:1.6;
-  appearance:none;
-  -webkit-appearance:none;
-  background-image:
-    linear-gradient(45deg, transparent 50%, #9fb0d0 50%),
-    linear-gradient(135deg, #9fb0d0 50%, transparent 50%);
-  background-position:
-    calc(100% - 20px) 42px,
-    calc(100% - 15px) 42px;
-  background-size:5px 5px;
-  background-repeat:no-repeat;
+  height:96px; padding-top:14px; padding-bottom:14px;
+  appearance:none; -webkit-appearance:none;
 }
 
 textarea{min-height:90px}
 
-.actions{
-  display:flex;
-  gap:8px;
-  margin-top:10px;
-  flex-wrap:wrap;
-}
-
+.actions{display:flex;gap:8px;margin-top:10px}
 button{
-  border-radius:12px;
-  border:0;
-  padding:10px 14px;
-  background:var(--accent);
-  font-weight:700;
-  cursor:pointer;
+  border-radius:12px; border:0;
+  padding:10px 14px; background:var(--accent);
+  font-weight:700; cursor:pointer;
 }
-button.danger{
-  background:var(--danger);
-  color:#fff;
-}
+button.danger{background:var(--danger);color:#fff}
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:10px;
-}
-th,td{
-  border-bottom:1px solid var(--line);
-  padding:8px;
-  font-size:12px;
-}
-th{
-  text-align:left;
-  color:#cfe6ff;
-}
-.tag{
-  background:#4da3ff33;
-  padding:3px 8px;
-  border-radius:999px;
-}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border-bottom:1px solid var(--line);padding:8px;font-size:12px}
+th{text-align:left;color:#cfe6ff}
+.tag{background:#4da3ff33;padding:3px 8px;border-radius:999px}
 </style>
 </head>
 
@@ -137,90 +73,77 @@ th{
   <div style="display:flex;justify-content:space-between">
     <div>
       <h1>RPI팀 협력사 방문앱</h1>
-      <div class="sub">※ 데이터는 브라우저 LocalStorage (visits_data)에 저장됩니다</div>
+      <div class="sub">※ 데이터는 LocalStorage(visits_data)에 저장됩니다</div>
     </div>
-    <div class="maker">만든이 : RPI팀 김정우 팀장</div>
+    <div class="maker">만든이 : 김정우 팀장</div>
   </div>
 </header>
 
 <main>
 <div class="grid">
 
-<!-- ✅ 방문 기록 추가 -->
 <section class="card">
 <h2>방문 기록 추가</h2>
 
 <div class="row">
+  <div>
+    <label>협력사명</label>
+    <input id="vendorName" list="vendorList"
+      class="input-tall" placeholder="예) 경동나비엔">
+    <datalist id="vendorList"></datalist>
+  </div>
 
-<div>
-<label>협력사명 (수기 + 드롭다운)</label>
-<input id="vendorName"
-       list="vendorList"
-       class="input-tall"
-       placeholder="예) 경동나비엔" />
-<datalist id="vendorList"></datalist>
-</div>
+  <div>
+    <label>방문일</label>
+    <input id="visitDate" type="date">
+  </div>
 
-<div>
-<label>방문일</label>
-<input id="visitDate" type="date" />
-</div>
+  <div>
+    <label>담당자</label>
+    <input id="managerName" list="managerList"
+      class="input-tall" placeholder="예) 조현준">
+    <datalist id="managerList"></datalist>
+  </div>
 
-<div>
-<label>담당자 (수기 + 드롭다운)</label>
-<input id="managerName"
-       list="managerList"
-       class="input-tall"
-       placeholder="예) 조현준" />
-<datalist id="managerList"></datalist>
-</div>
+  <div>
+    <label>방문자</label>
+    <input id="visitorName" placeholder="예) 김정우,이정수">
+  </div>
 
-<div>
-<label>방문자</label>
-<input id="visitorName" placeholder="예) 김정우,이정수" />
-</div>
+  <div>
+    <label>회의 목적</label>
+    <select id="meetingPurpose" class="select-tall">
+      <option value="단가 협의">단가 협의</option>
+      <option value="신규 개발">신규 개발</option>
+      <option value="품질 협의">품질 협의</option>
+      <option value="기타" selected>기타</option>
+    </select>
+  </div>
 
-<div>
-<label>회의 목적</label>
-<select id="meetingPurpose" class="select-tall">
-  <option value="단가 협의">단가 협의</option>
-  <option value="신규 개발">신규 개발</option>
-  <option value="품질 협의">품질 협의</option>
-  <option value="기타" selected>기타</option>
-</select>
-</div>
+  <div>
+    <label>목적 상세</label>
+    <input id="meetingDetailShort" placeholder="예) 공정 라인 확인">
+  </div>
 
-<div>
-<label>목적 상세</label>
-<input id="meetingDetailShort" placeholder="예) 공정 라인 확인" />
-</div>
-
-<div style="grid-column:1/-1">
-<label>메모</label>
-<textarea id="meetingDetail"></textarea>
-</div>
-
+  <div style="grid-column:1/-1">
+    <label>메모</label>
+    <textarea id="meetingDetail"></textarea>
+  </div>
 </div>
 
 <div class="actions">
-  <button onclick="addVisit()">추가</button>
-  <button class="danger" onclick="clearAll()">전체 삭제</button>
+  <button id="addBtn">추가</button>
+  <button class="danger" id="clearBtn">전체 삭제</button>
 </div>
 </section>
 
-<!-- ✅ 최근 방문 -->
 <section class="card">
 <h2>최근 방문 10건</h2>
-
 <table>
 <thead>
 <tr>
-<th>날짜</th>
-<th>담당자</th>
-<th>협력사</th>
-<th>방문자</th>
-<th>목적</th>
-<th>내용</th>
+<th>날짜</th><th>담당자</th><th>협력사</th>
+<th>방문자</th><th>목적</th><th>내용</th>
 </tr>
 </thead>
 <tbody id="recentBody"></tbody>
@@ -231,17 +154,62 @@ th{
 </main>
 
 <script>
-const STORAGE_KEY='visits_data';
+document.addEventListener('DOMContentLoaded', () => {
+
+const STORAGE_KEY = 'visits_data';
+
+/* DOM */
+const vendorName = document.getElementById('vendorName');
+const visitDate = document.getElementById('visitDate');
+const managerName = document.getElementById('managerName');
+const visitorName = document.getElementById('visitorName');
+const meetingPurpose = document.getElementById('meetingPurpose');
+const meetingDetailShort = document.getElementById('meetingDetailShort');
+const meetingDetail = document.getElementById('meetingDetail');
+const recentBody = document.getElementById('recentBody');
+const vendorList = document.getElementById('vendorList');
+const managerList = document.getElementById('managerList');
 
 function load(){
-  return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+  return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 }
 function save(arr){
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(arr));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
 }
 
-function addVisit(){
-  const v={
+function render(){
+  const arr = load().sort((a,b)=>b.visitDate.localeCompare(a.visitDate));
+  recentBody.innerHTML = '';
+
+  arr.slice(0,10).forEach(v=>{
+    recentBody.insertAdjacentHTML('beforeend',`
+      <tr>
+        <td>${v.visitDate}</td>
+        <td>${v.managerName}</td>
+        <td><span class="tag">${v.vendorName}</span></td>
+        <td>${v.visitorName}</td>
+        <td>${v.meetingPurpose}</td>
+        <td>${v.meetingDetailShort||''}</td>
+      </tr>
+    `);
+  });
+
+  vendorList.innerHTML='';
+  [...new Set(arr.map(x=>x.vendorName).filter(Boolean))]
+    .forEach(v=>vendorList.insertAdjacentHTML('beforeend',`<option value="${v}">`));
+
+  managerList.innerHTML='';
+  [...new Set(arr.map(x=>x.managerName).filter(Boolean))]
+    .forEach(v=>managerList.insertAdjacentHTML('beforeend',`<option value="${v}">`));
+}
+
+document.getElementById('addBtn').onclick = () => {
+  if(!vendorName.value || !visitDate.value){
+    alert('협력사명과 방문일은 필수입니다');
+    return;
+  }
+  const arr = load();
+  arr.push({
     id:'v_'+Date.now(),
     vendorName:vendorName.value.trim(),
     visitDate:visitDate.value,
@@ -251,49 +219,21 @@ function addVisit(){
     meetingDetailShort:meetingDetailShort.value.trim(),
     meetingDetail:meetingDetail.value.trim(),
     createdAt:Date.now()
-  };
-  if(!v.vendorName||!v.visitDate){
-    alert('협력사명과 방문일은 필수입니다.');
-    return;
-  }
-  const arr=load();
-  arr.push(v);
+  });
   save(arr);
   render();
-}
+};
 
-function clearAll(){
+document.getElementById('clearBtn').onclick = () => {
   if(confirm('전체 삭제하시겠습니까?')){
     localStorage.removeItem(STORAGE_KEY);
     render();
   }
-}
+};
 
-function render(){
-  const arr=load().sort((a,b)=>b.visitDate.localeCompare(a.visitDate));
-  recentBody.innerHTML='';
-  arr.slice(0,10).forEach(v=>{
-    recentBody.innerHTML+=`
-    <tr>
-      <td>${v.visitDate}</td>
-      <td>${v.managerName}</td>
-      <td><span class="tag">${v.vendorName}</span></td>
-      <td>${v.visitorName}</td>
-      <td>${v.meetingPurpose}</td>
-      <td>${v.meetingDetailShort||''}</td>
-    </tr>`;
-  });
-
-  vendorList.innerHTML='';
-  [...new Set(arr.map(x=>x.vendorName))].forEach(x=>{
-    vendorList.innerHTML+=`<option value="${x}">`;
-  });
-  managerList.innerHTML='';
-  [...new Set(arr.map(x=>x.managerName))].forEach(x=>{
-    managerList.innerHTML+=`<option value="${x}">`;
-  });
-}
 render();
+
+});
 </script>
 
 </body>
