@@ -1,247 +1,392 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RPI팀 협력사 방문앱</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RPI 협력사 방문 관리</title>
 
-<style>
-:root{
-  --bg:#0b1220;
-  --card:#101a33;
-  --text:#e9eefc;
-  --muted:#9fb0d0;
-  --accent:#4da3ff;
-  --danger:#ff5c7a;
-  --line:rgba(255,255,255,.12);
-  --radius:14px;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:system-ui,-apple-system,"Noto Sans KR","Malgun Gothic";
-}
-header{
-  padding:16px 20px;
-  border-bottom:1px solid var(--line);
-}
-h1{margin:0;font-size:20px}
-.sub{font-size:12px;color:var(--muted);margin-top:6px}
-.maker{font-size:12px;color:var(--muted);text-align:right}
-
-main{max-width:1100px;margin:auto;padding:16px}
-.grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:16px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
-
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  padding:14px;
-}
-.card h2{margin:0 0 10px;font-size:14px}
-
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:600px){.row{grid-template-columns:1fr}}
-
-label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
-input,textarea,select{
-  width:100%;
-  border-radius:12px;
-  background:#00000030;
-  color:var(--text);
-  border:1px solid var(--line);
-  padding:10px;
-  font-size:14px;
-}
-
-/* ✅ 세로 크게 쓰는 입력칸 */
-.input-tall{
-  height:96px;
-  padding-top:14px;
-  padding-bottom:14px;
-}
-
-/* ✅ select는 별도 처리 필요 */
-.select-tall{
-  height:96px;
-  padding-top:14px;
-  padding-bottom:14px;
-  line-height:1.6;
-  appearance:none;
-  -webkit-appearance:none;
-  background-image:
-    linear-gradient(45deg, transparent 50%, #9fb0d0 50%),
-    linear-gradient(135deg, #9fb0d0 50%, transparent 50%);
-  background-position:
-    calc(100% - 20px) 42px,
-    calc(100% - 15px) 42px;
-  background-size:5px 5px;
-  background-repeat:no-repeat;
-}
-
-textarea{min-height:90px}
-
-button{
-  border-radius:12px;
-  border:0;
-  padding:10px 14px;
-  background:var(--accent);
-  font-weight:700;
-  cursor:pointer;
-}
-button.danger{background:var(--danger);color:#fff}
-
-.actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-
-table{width:100%;border-collapse:collapse;margin-top:10px}
-th,td{border-bottom:1px solid var(--line);padding:8px;font-size:12px}
-th{text-align:left;color:#cfe6ff}
-.tag{background:#4da3ff33;padding:3px 8px;border-radius:999px}
-</style>
+  <style>
+    body{
+      font-family:system-ui,-apple-system,"Noto Sans KR","Malgun Gothic";
+      background:#0b1220; color:#e9eefc; margin:0;
+    }
+    h1{margin:0;font-size:20px}
+    .wrap{max-width:1100px;margin:auto;padding:16px}
+    .card{
+      background:#101a33;border-radius:14px;
+      padding:14px;margin-bottom:16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    label{display:block;margin-top:10px;font-size:12px;color:#9fb0d0}
+    input,select,textarea{
+      width:100%;border-radius:12px;
+      background:#00000030;color:#e9eefc;
+      border:1px solid rgba(255,255,255,.12);
+      padding:10px;font-size:14px;
+      box-sizing:border-box;
+      outline:none;
+    }
+    input::placeholder{color:#7f93b8}
+    .input-tall{height:96px;padding-top:14px;padding-bottom:14px}
+    .select-tall{height:96px}
+    button{
+      background:#4da3ff;color:#081122;
+      border:0;border-radius:12px;
+      padding:10px 14px;font-weight:700;
+      cursor:pointer;
+    }
+    button:hover{filter:brightness(1.05)}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{border-bottom:1px solid rgba(255,255,255,.12);padding:8px;font-size:12px;vertical-align:top}
+    th{text-align:left;color:#cfe6ff}
+    .tag{background:#4da3ff33;padding:2px 8px;border-radius:999px}
+    .hint{font-size:12px;color:#9fb0d0;margin:6px 0 0}
+    .warn{
+      background:#ffcc0022;
+      border:1px solid rgba(255,204,0,.35);
+      color:#ffeaa0;
+      padding:10px 12px;
+      border-radius:12px;
+      margin:12px 0;
+      font-size:12px;
+      line-height:1.4;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 860px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+    .kpi{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+      margin-top:10px;
+    }
+    .kpi .box{
+      background:#0b1430;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:12px;
+      padding:10px;
+    }
+    .kpi .t{font-size:11px;color:#9fb0d0}
+    .kpi .v{font-size:18px;font-weight:800;margin-top:4px}
+    canvas{background:#0b1430;border-radius:12px;border:1px solid rgba(255,255,255,.10)}
+  </style>
 </head>
 
 <body>
+  <div class="wrap">
+    <h1>RPI 협력사 방문 관리</h1>
+    <p class="hint">※ 데이터는 브라우저 LocalStorage(<b>visits_data</b>)에 저장됩니다</p>
 
-<header>
-  <div style="display:flex;justify-content:space-between">
-    <div>
-      <h1>RPI팀 협력사 방문앱</h1>
-      <div class="sub">※ 데이터는 브라우저 LocalStorage(visits_data)에 저장됩니다</div>
+    <div id="storageWarn" class="warn" style="display:none;">
+      현재 브라우저 환경에서 LocalStorage 접근이 차단되어 저장/조회가 안 될 수 있습니다.
+      (사내 보안 설정/프라이빗 모드/추적방지 옵션 등)<br/>
+      해결: 일반 모드 크롬/엣지에서 열거나, 사이트 저장소 차단을 해제하세요.
     </div>
-    <div class="maker">만든이 : RPI팀 김정우 팀장</div>
+
+    <div id="chartWarn" class="warn" style="display:none;">
+      차트 라이브러리(Chart.js) 로드에 실패했습니다.<br/>
+      해결(권장): 저장소에 <b>assets/chart.umd.min.js</b> 파일을 올려 로컬 로드되게 하세요.
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:14px;margin:0 0 6px;">방문 기록 추가</h2>
+
+      <label for="vendorName">협력사명</label>
+      <input id="vendorName" class="input-tall" placeholder="예) 경동나비엔" />
+
+      <label for="visitDate">방문일</label>
+      <input id="visitDate" type="date" />
+
+      <label for="managerName">담당자</label>
+      <input id="managerName" class="input-tall" placeholder="예) 조현준" />
+
+      <label for="visitorName">방문자</label>
+      <input id="visitorName" placeholder="예) 김정우,이정수" />
+
+      <label for="meetingPurpose">회의 목적</label>
+      <select id="meetingPurpose" class="select-tall">
+        <option>단가 협의</option>
+        <option>신규 개발</option>
+        <option>품질 협의</option>
+        <option selected>기타</option>
+      </select>
+
+      <label for="detailShort">목적 상세</label>
+      <input id="detailShort" placeholder="예) 공정 라인 확인" />
+
+      <br /><br />
+      <button id="addBtn" type="button">추가</button>
+
+      <div class="kpi" style="margin-top:14px;">
+        <div class="box">
+          <div class="t">총 방문 수</div>
+          <div class="v" id="kpiTotal">0</div>
+        </div>
+        <div class="box">
+          <div class="t">협력사 수(유니크)</div>
+          <div class="v" id="kpiVendors">0</div>
+        </div>
+        <div class="box">
+          <div class="t">마지막 방문일</div>
+          <div class="v" id="kpiLast">-</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ 그래프 영역 (복원) -->
+    <div class="card">
+      <h2 style="font-size:14px;margin:0 0 10px;">방문 통계 그래프</h2>
+      <div class="grid">
+        <div>
+          <div class="hint" style="margin:0 0 6px;">월별 방문 횟수</div>
+          <canvas id="chartMonthly" height="280"></canvas>
+        </div>
+        <div>
+          <div class="hint" style="margin:0 0 6px;">담당자별 방문 횟수 (TOP 10)</div>
+          <canvas id="chartManager" height="280"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:14px;margin:0 0 6px;">최근 방문</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>날짜</th><th>담당자</th><th>협력사</th>
+            <th>방문자</th><th>목적</th><th>내용</th>
+          </tr>
+        </thead>
+        <tbody id="list"></tbody>
+      </table>
+    </div>
   </div>
-</header>
 
-<main>
-<div class="grid">
+  <!-- ✅ 1) 로컬 Chart.js (권장): /assets/chart.umd.min.js -->
+  <script src="assets/chart.umd.min.js"></script>
 
-<section class="card">
-<h2>방문 기록 추가</h2>
+  <!-- ✅ 2) CDN 폴백 (로컬이 없을 때만 시도) -->
+  <script>
+    (function(){
+      if (window.Chart) return;
+      const s = document.createElement('script');
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js";
+      s.onload = () => console.log("Chart.js loaded from CDN");
+      s.onerror = () => console.warn("Chart.js CDN blocked");
+      document.head.appendChild(s);
+    })();
+  </script>
 
-<div class="row">
+  <script>
+    (function () {
+      const KEY = 'visits_data';
+      const $ = (id) => document.getElementById(id);
 
-<div>
-<label>협력사명 (수기 + 드롭다운)</label>
-<input id="vendorName" list="vendorList"
-       class="input-tall"
-       placeholder="예) 정민테크 (직접 입력 가능)" />
-<datalist id="vendorList"></datalist>
-</div>
+      let monthlyChart = null;
+      let managerChart = null;
 
-<div>
-<label>방문일</label>
-<input id="visitDate" type="date" />
-</div>
+      function storageAvailable() {
+        try {
+          const t = '__test__';
+          localStorage.setItem(t, '1');
+          localStorage.removeItem(t);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
 
-<div>
-<label>담당자 (수기 + 드롭다운)</label>
-<input id="managerName" list="managerList"
-       class="input-tall"
-       placeholder="예) 조현준 (직접 입력 가능)" />
-<datalist id="managerList"></datalist>
-</div>
+      if (!storageAvailable()) {
+        $('storageWarn').style.display = 'block';
+      }
 
-<div>
-<label>방문자</label>
-<input id="visitorName" placeholder="예) 김정우,이정수" />
-</div>
+      function load() {
+        try { return JSON.parse(localStorage.getItem(KEY)) || []; }
+        catch (e) { return []; }
+      }
 
-<div>
-<label>회의 목적</label>
-<select id="meetingPurpose" class="select-tall">
-  <option value="단가 협의">단가 협의</option>
-  <option value="신규 개발">신규 개발</option>
-  <option value="품질 협의">품질 협의</option>
-  <option value="기타" selected>기타</option>
-</select>
-</div>
+      function save(arr) {
+        localStorage.setItem(KEY, JSON.stringify(arr));
+      }
 
-<div>
-<label>목적 상세</label>
-<input id="meetingDetailShort" placeholder="예) 공정 라인 확인" />
-</div>
+      function esc(s) {
+        return String(s ?? '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+      }
 
-<div style="grid-column:1/-1">
-<label>메모</label>
-<textarea id="meetingDetail"></textarea>
-</div>
+      function ym(dateStr){
+        // "2026-05-12" -> "2026-05"
+        if(!dateStr || dateStr.length < 7) return '';
+        return dateStr.slice(0,7);
+      }
 
-</div>
+      function computeStats(arr){
+        const total = arr.length;
+        const vendorSet = new Set(arr.map(v => (v.vendor || '').trim()).filter(Boolean));
+        const last = arr.map(v => v.date).filter(Boolean).sort().pop() || '-';
 
-<div class="actions">
-  <button onclick="addVisit()">추가</button>
-  <button class="danger" onclick="clearAll()">전체 삭제</button>
-</div>
-</section>
+        const monthly = new Map();
+        const manager = new Map();
 
-<section class="card">
-<h2>최근 방문 10건</h2>
-<table>
-<thead>
-<tr>
-<th>날짜</th><th>담당자</th><th>협력사</th>
-<th>방문자</th><th>목적</th><th>내용</th>
-</tr>
-</thead>
-<tbody id="recentBody"></tbody>
-</table>
-</section>
+        for (const v of arr) {
+          const m = ym(v.date);
+          if (m) monthly.set(m, (monthly.get(m) || 0) + 1);
 
-</div>
-</main>
+          const mg = (v.manager || '').trim() || '(미입력)';
+          manager.set(mg, (manager.get(mg) || 0) + 1);
+        }
 
-<script>
-const STORAGE_KEY='visits_data';
+        // 정렬: 월은 오름차순, 담당자는 내림차순
+        const monthlyLabels = Array.from(monthly.keys()).sort();
+        const monthlyData = monthlyLabels.map(k => monthly.get(k));
 
-function load(){return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}
-function save(a){localStorage.setItem(STORAGE_KEY,JSON.stringify(a))}
+        const managerPairs = Array.from(manager.entries()).sort((a,b)=>b[1]-a[1]).slice(0,10);
+        const managerLabels = managerPairs.map(p=>p[0]);
+        const managerData = managerPairs.map(p=>p[1]);
 
-function addVisit(){
-  const v={
-    id:'v_'+Date.now(),
-    vendorName:vendorName.value.trim(),
-    visitDate:visitDate.value,
-    managerName:managerName.value.trim(),
-    visitorName:visitorName.value.trim(),
-    meetingPurpose:meetingPurpose.value,
-    meetingDetailShort:meetingDetailShort.value.trim(),
-    meetingDetail:meetingDetail.value.trim(),
-    createdAt:Date.now()
-  };
-  if(!v.vendorName||!v.visitDate){alert('협력사명/방문일 필수');return}
-  const a=load();a.push(v);save(a);render()
-}
+        return { total, vendorCount: vendorSet.size, last, monthlyLabels, monthlyData, managerLabels, managerData };
+      }
 
-function clearAll(){
-  if(confirm('전체 삭제?')){
-    localStorage.removeItem(STORAGE_KEY);render()
-  }
-}
+      function renderList() {
+        const list = load().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        const body = $('list');
+        body.innerHTML = '';
 
-function render(){
-  const a=load().sort((x,y)=>y.visitDate.localeCompare(x.visitDate))
-  recentBody.innerHTML=''
-  a.slice(0,10).forEach(v=>{
-    recentBody.innerHTML+=`
-    <tr>
-      <td>${v.visitDate}</td>
-      <td>${v.managerName}</td>
-      <td><span class="tag">${v.vendorName}</span></td>
-      <td>${v.visitorName}</td>
-      <td>${v.meetingPurpose}</td>
-      <td>${v.meetingDetailShort||''}</td>
-    </tr>`
-  })
-  vendorList.innerHTML=''
-  [...new Set(a.map(x=>x.vendorName))].forEach(x=>vendorList.innerHTML+=`<option value="${x}">`)
-  managerList.innerHTML=''
-  [...new Set(a.map(x=>x.managerName))].forEach(x=>managerList.innerHTML+=`<option value="${x}">`)
-}
-render()
-</script>
+        list.slice(0, 10).forEach(v => {
+          body.insertAdjacentHTML('beforeend', `
+            <tr>
+              <td>${esc(v.date)}</td>
+              <td>${esc(v.manager)}</td>
+              <td><span class="tag">${esc(v.vendor)}</span></td>
+              <td>${esc(v.visitors)}</td>
+              <td>${esc(v.purpose)}</td>
+              <td>${esc(v.detail)}</td>
+            </tr>
+          `);
+        });
+      }
 
+      function renderKPI(stats){
+        $('kpiTotal').textContent = stats.total;
+        $('kpiVendors').textContent = stats.vendorCount;
+        $('kpiLast').textContent = stats.last;
+      }
+
+      function renderCharts(stats){
+        // Chart.js가 아직 로드되지 않았다면 경고 표시
+        if (!window.Chart) {
+          $('chartWarn').style.display = 'block';
+          return;
+        } else {
+          $('chartWarn').style.display = 'none';
+        }
+
+        // 공통 옵션(다크)
+        const common = {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#cfe6ff' } }
+          },
+          scales: {
+            x: { ticks: { color: '#9fb0d0' }, grid: { color: 'rgba(255,255,255,.06)' } },
+            y: { ticks: { color: '#9fb0d0' }, grid: { color: 'rgba(255,255,255,.06)' }, beginAtZero: true }
+          }
+        };
+
+        // 월별
+        const ctxM = document.getElementById('chartMonthly').getContext('2d');
+        if (monthlyChart) monthlyChart.destroy();
+        monthlyChart = new Chart(ctxM, {
+          type: 'bar',
+          data: {
+            labels: stats.monthlyLabels,
+            datasets: [{
+              label: '방문 횟수',
+              data: stats.monthlyData,
+              backgroundColor: 'rgba(77,163,255,0.45)',
+              borderColor: 'rgba(77,163,255,0.9)',
+              borderWidth: 1
+            }]
+          },
+          options: common
+        });
+
+        // 담당자 TOP10
+        const ctxG = document.getElementById('chartManager').getContext('2d');
+        if (managerChart) managerChart.destroy();
+        managerChart = new Chart(ctxG, {
+          type: 'bar',
+          data: {
+            labels: stats.managerLabels,
+            datasets: [{
+              label: '방문 횟수',
+              data: stats.managerData,
+              backgroundColor: 'rgba(120,255,205,0.30)',
+              borderColor: 'rgba(120,255,205,0.85)',
+              borderWidth: 1
+            }]
+          },
+          options: common
+        });
+      }
+
+      function renderAll(){
+        const arr = load();
+        const stats = computeStats(arr);
+        renderKPI(stats);
+        renderList();
+        renderCharts(stats);
+      }
+
+      $('addBtn').onclick = function () {
+        const vendor = $('vendorName').value.trim();
+        const date = $('visitDate').value;
+
+        if (!vendor || !date) {
+          alert('협력사명과 방문일은 필수입니다');
+          return;
+        }
+
+        const arr = load();
+        arr.push({
+          vendor,
+          date,
+          manager: $('managerName').value.trim(),
+          visitors: $('visitorName').value.trim(),
+          purpose: $('meetingPurpose').value,
+          detail: $('detailShort').value.trim()
+        });
+
+        save(arr);
+        // 입력 편의
+        $('detailShort').value = '';
+        renderAll();
+      };
+
+      // Chart.js CDN 폴백이 비동기 로드라서, 로드될 때까지 몇 번 재시도
+      function waitChartThenRender(){
+        let tries = 0;
+        const timer = setInterval(()=>{
+          tries++;
+          if (window.Chart || tries >= 20) { // 최대 2초(100ms*20)
+            clearInterval(timer);
+            renderAll();
+          }
+        }, 100);
+      }
+
+      waitChartThenRender();
+    })();
+  </script>
 </body>
 </html>
