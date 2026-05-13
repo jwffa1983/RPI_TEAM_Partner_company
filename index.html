@@ -1,303 +1,92 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>RPI팀 협력사 방문앱</title>
-  <style>
-    :root{
-      --bg:#0b1220;
-      --card:#101a33;
-      --card2:#0f1830;
-      --text:#e9eefc;
-      --muted:#9fb0d0;
-      --accent:#4da3ff;
-      --accent2:#7c5cff;
-      --danger:#ff5c7a;
-      --ok:#30d158;
-      --line:rgba(255,255,255,.10);
-      --shadow:0 10px 30px rgba(0,0,0,.35);
-      --radius:14px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, Helvetica, Arial, "Apple SD Gothic Neo","Malgun Gothic","맑은 고딕", sans-serif;
-      background: radial-gradient(1200px 600px at 20% 0%, rgba(77,163,255,.18), transparent 60%),
-                  radial-gradient(900px 500px at 90% 10%, rgba(124,92,255,.18), transparent 60%),
-                  var(--bg);
-      color:var(--text);
-    }
-    header{
-      padding:20px 18px 12px;
-      border-bottom:1px solid var(--line);
-      position:sticky;
-      top:0;
-      background:rgba(11,18,32,.92);
-      backdrop-filter: blur(10px);
-      z-index:10;
-    }
-    .toprow{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-      max-width:1100px;
-      margin:0 auto;
-    }
-    h1{
-      margin:0;
-      font-size:20px;
-      font-weight:800;
-      letter-spacing:-.2px;
-    }
-    .sub{
-      margin-top:6px;
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.35;
-    }
-    .maker{
-      text-align:right;
-      font-size:12px;
-      color:var(--muted);
-      padding-top:3px;
-      white-space:nowrap;
-    }
-    main{
-      max-width:1100px;
-      margin:0 auto;
-      padding:16px 18px 28px;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap:14px;
-    }
-    @media (max-width: 980px){
-      .grid{grid-template-columns:1fr}
-      .maker{display:none;}
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 40%), var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:14px;
-    }
-    .card h2{
-      margin:0 0 10px;
-      font-size:14px;
-      color:#dbe6ff;
-      letter-spacing:-.2px;
-    }
-    .row{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    @media (max-width: 560px){
-      .row{grid-template-columns:1fr}
-    }
-    label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin:0 0 6px;
-    }
-    input, select, textarea{
-      width:100%;
-      padding:10px 10px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.22);
-      color:var(--text);
-      outline:none;
-      transition:.15s ease;
-    }
-    input:focus, select:focus, textarea:focus{
-      border-color: rgba(77,163,255,.55);
-      box-shadow: 0 0 0 3px rgba(77,163,255,.15);
-    }
-    textarea{min-height:82px; resize:vertical}
-    .actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top:10px;
-    }
-    button{
-      border:0;
-      border-radius:12px;
-      padding:10px 12px;
-      font-weight:700;
-      cursor:pointer;
-      color:#081122;
-      background:linear-gradient(180deg, rgba(255,255,255,.12), transparent 40%), var(--accent);
-      transition:.15s ease;
-    }
-    button.secondary{
-      color:var(--text);
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.12);
-    }
-    button.danger{
-      color:#fff;
-      background:linear-gradient(180deg, rgba(255,255,255,.10), transparent 50%), var(--danger);
-    }
-    button:active{transform:translateY(1px)}
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:12px;
-      color:var(--muted);
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.04);
-    }
-    .kpis{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-      margin-top:10px;
-    }
-    @media (max-width: 560px){
-      .kpis{grid-template-columns:1fr}
-    }
-    .kpi{
-      padding:12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.10);
-      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 40%), var(--card2);
-    }
-    .kpi .v{
-      font-size:22px;
-      font-weight:900;
-      margin-top:6px;
-      letter-spacing:-.4px;
-    }
-    .kpi .t{
-      font-size:12px;
-      color:var(--muted);
-    }
-    .split{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:10px;
-    }
-    @media (max-width: 700px){
-      .split{grid-template-columns:1fr}
-    }
-    .box{
-      border:1px dashed rgba(255,255,255,.18);
-      border-radius:14px;
-      padding:10px;
-      background:rgba(0,0,0,.16);
-      min-height:120px;
-    }
-    .box pre{
-      margin:0;
-      white-space:pre-wrap;
-      font-family: var(--mono);
-      font-size:12px;
-      color:#dbe6ff;
-      line-height:1.4;
-    }
-    .muted{color:var(--muted)}
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      overflow:hidden;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.10);
-    }
-    th, td{
-      padding:10px 10px;
-      text-align:left;
-      font-size:12px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      vertical-align:top;
-    }
-    th{
-      background:rgba(255,255,255,.06);
-      color:#dbe6ff;
-      font-weight:800;
-    }
-    tr:last-child td{border-bottom:0}
-    .tag{
-      display:inline-block;
-      padding:3px 8px;
-      border-radius:999px;
-      font-size:11px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(77,163,255,.12);
-      color:#cfe6ff;
-      white-space:nowrap;
-    }
-    .btn-mini{
-      padding:6px 10px;
-      border-radius:10px;
-      font-size:12px;
-      font-weight:800;
-    }
-    .barwrap{
-      margin-top:10px;
-      display:grid;
-      gap:8px;
-    }
-    .barrow{
-      display:grid;
-      grid-template-columns: 70px 1fr 40px;
-      gap:10px;
-      align-items:center;
-    }
-    .bar{
-      height:10px;
-      border-radius:999px;
-      background:rgba(255,255,255,.10);
-      overflow:hidden;
-    }
-    .bar > i{
-      display:block;
-      height:100%;
-      width:0%;
-      background:linear-gradient(90deg, var(--accent), var(--accent2));
-      border-radius:999px;
-    }
-    .toast{
-      position:fixed;
-      right:16px;
-      bottom:16px;
-      background:rgba(10,18,34,.92);
-      border:1px solid rgba(255,255,255,.14);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius:12px;
-      box-shadow: var(--shadow);
-      font-size:13px;
-      display:none;
-      z-index:999;
-      max-width:min(520px, calc(100vw - 32px));
-    }
-    .toast.ok{border-color: rgba(48,209,88,.35)}
-    .toast.bad{border-color: rgba(255,92,122,.35)}
-    .small{font-size:12px}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RPI팀 협력사 방문앱</title>
+
+<style>
+:root{
+  --bg:#0b1220; --card:#101a33; --card2:#0f1830;
+  --text:#e9eefc; --muted:#9fb0d0;
+  --accent:#4da3ff; --danger:#ff5c7a;
+  --line:rgba(255,255,255,.12);
+  --radius:14px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--text);
+  font-family:system-ui,-apple-system,"Noto Sans KR","Malgun Gothic";
+  background:var(--bg);
+}
+header{
+  padding:16px 20px; border-bottom:1px solid var(--line);
+  background:#0b1220cc; backdrop-filter:blur(8px);
+}
+h1{margin:0;font-size:20px}
+.sub{font-size:12px;color:var(--muted);margin-top:6px}
+.maker{font-size:12px;color:var(--muted);text-align:right}
+
+main{max-width:1100px;margin:auto;padding:16px}
+.grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:16px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:14px;
+}
+.card h2{margin:0 0 10px;font-size:14px}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+
+label{font-size:12px;color:var(--muted)}
+input,select,textarea{
+  width:100%; border-radius:12px;
+  background:#00000030; color:var(--text);
+  border:1px solid var(--line);
+  padding:10px;
+  font-size:14px;
+}
+
+/* ✅ 요청 반영: 세로 3배 입력칸 */
+.input-tall, .select-tall{
+  height:96px;
+  padding-top:14px;
+  padding-bottom:14px;
+}
+
+/* 기타 */
+textarea{min-height:90px}
+button{
+  border-radius:12px;border:0;
+  padding:10px 12px;
+  background:var(--accent);
+  cursor:pointer;font-weight:700
+}
+button.secondary{background:#ffffff20;color:var(--text)}
+button.danger{background:var(--danger);color:#fff}
+
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border-bottom:1px solid var(--line);padding:8px;font-size:12px}
+th{color:#cfe6ff;text-align:left}
+.tag{background:#4da3ff30;padding:3px 8px;border-radius:999px}
+
+</style>
 </head>
 
 <body>
+
 <header>
-  <div class="toprow">
+  <div style="display:flex;justify-content:space-between;gap:12px;">
     <div>
       <h1>RPI팀 협력사 방문앱</h1>
       <div class="sub">
-        ※ 데이터는 브라우저(LocalStorage)에 저장됩니다. (공용/서버 저장 아님) [1](https://kdiwin-my.sharepoint.com/personal/jwffa_kdiwin_com/Documents/2.RPI%ed%8c%80-HTML/RPI%ed%8c%80_%ed%88%ac%ec%9e%90%ec%83%81%ea%b0%81_%ea%b3%84%ec%82%b0%ea%b8%b0_V1.html?web=1)<br/>
-        <span class="muted">핵심 수정: visits_data 키 통일 + 날짜 내림차순 정렬 후 최근10건/요약 표시</span>
+        ※ 데이터는 브라우저 LocalStorage(visits_data)에 저장됩니다
       </div>
     </div>
     <div class="maker">만든이 : RPI팀 김정우 팀장</div>
@@ -305,514 +94,142 @@
 </header>
 
 <main>
-  <div class="grid">
-    <!-- 입력 -->
-    <section class="card">
-      <h2>방문 기록 추가</h2>
-      <div class="row">
-        <div>
-          <label>협력사명</label>
-          <input id="vendorName" list="vendorList" placeholder="예) 정민테크" />
-          <datalist id="vendorList"></datalist>
-        </div>
-        <div>
-          <label>방문일</label>
-          <input id="visitDate" type="date" />
-        </div>
+<div class="grid">
 
-        <div>
-          <label>담당자</label>
-          <input id="managerName" list="managerList" placeholder="예) 조현준" />
-          <datalist id="managerList"></datalist>
-        </div>
-        <div>
-          <label>방문자(쉼표로 구분)</label>
-          <input id="visitorName" placeholder="예) 김정우,이정수" />
-        </div>
+<!-- ✅ 입력 영역 -->
+<section class="card">
+<h2>방문 기록 추가</h2>
 
-        <div>
-          <label>회의 목적</label>
-          <select id="meetingPurpose">
-            <option value="단가 협의">단가 협의</option>
-            <option value="신규 개발">신규 개발</option>
-            <option value="품질 협의">품질 협의</option>
-            <option value="기타" selected>기타</option>
-          </select>
-        </div>
-        <div>
-          <label>목적 상세 내용</label>
-          <input id="meetingDetailShort" placeholder="예) 공정 라인 확인" />
-        </div>
+<div class="row">
 
-        <div style="grid-column:1/-1;">
-          <label>상세 메모(선택)</label>
-          <textarea id="meetingDetail" placeholder="추가로 남길 메모가 있으면 작성"></textarea>
-        </div>
-      </div>
+<div>
+<label>협력사명 (수기 + 드롭다운)</label>
+<input id="vendorName" list="vendorList"
+       class="input-tall"
+       placeholder="예) 정민테크 (직접 입력 가능)" />
+<datalist id="vendorList"></datalist>
+</div>
 
-      <div class="actions">
-        <button id="btnAdd">추가</button>
-        <button class="secondary" id="btnSample">샘플 데이터 추가</button>
-        <button class="danger" id="btnClearAll">전체 삭제</button>
-        <button class="secondary" id="btnExport">JSON 내보내기</button>
-        <button class="secondary" id="btnImport">JSON 가져오기</button>
-        <input id="importFile" type="file" accept="application/json" style="display:none" />
-      </div>
+<div>
+<label>방문일</label>
+<input id="visitDate" type="date" />
+</div>
 
-      <div class="kpis" aria-label="요약 KPI">
-        <div class="kpi">
-          <div class="t">총 방문 횟수</div>
-          <div class="v" id="kpiTotal">0</div>
-        </div>
-        <div class="kpi">
-          <div class="t">담당자 수(유니크)</div>
-          <div class="v" id="kpiManagers">0</div>
-        </div>
-        <div class="kpi">
-          <div class="t">회의 목적 종류</div>
-          <div class="v" id="kpiPurposes">0</div>
-        </div>
-      </div>
+<div>
+<label>담당자 (수기 + 드롭다운)</label>
+<input id="managerName" list="managerList"
+       class="input-tall"
+       placeholder="예) 조현준 (직접 입력 가능)" />
+<datalist id="managerList"></datalist>
+</div>
 
-      <div class="split">
-        <div class="box">
-          <div class="pill">요약 왼쪽(최근1건)</div>
-          <div class="actions" style="margin-top:8px">
-            <button class="secondary btn-mini" id="btnCopy1">복사</button>
-          </div>
-          <pre id="summary1" class="small muted">-</pre>
-        </div>
-        <div class="box">
-          <div class="pill">요약 오른쪽(최근10건)</div>
-          <div class="actions" style="margin-top:8px">
-            <button class="secondary btn-mini" id="btnCopy10">복사</button>
-          </div>
-          <pre id="summary10" class="small muted">-</pre>
-        </div>
-      </div>
-    </section>
+<div>
+<label>방문자</label>
+<input id="visitorName" placeholder="예) 김정우,이정수" />
+</div>
 
-    <!-- 현황/차트/최근 -->
-    <section class="card">
-      <h2>현황(월별/목적 분포/최근 방문)</h2>
+<div>
+<label>회의 목적</label>
+<select id="meetingPurpose" class="select-tall">
+  <option value="단가 협의">단가 협의</option>
+  <option value="신규 개발">신규 개발</option>
+  <option value="품질 협의">품질 협의</option>
+  <option value="기타" selected>기타</option>
+</select>
+</div>
 
-      <div class="pill">월별 방문 추이</div>
-      <div id="monthlyBars" class="barwrap" aria-label="월별 방문 바 차트"></div>
+<div>
+<label>목적 상세</label>
+<input id="meetingDetailShort" placeholder="예) 공정 라인 확인" />
+</div>
 
-      <div style="height:10px"></div>
-      <div class="pill">목적 분포</div>
-      <div id="purposeBars" class="barwrap" aria-label="목적 분포 바 차트"></div>
+<div style="grid-column:1/-1">
+<label>메모</label>
+<textarea id="meetingDetail"></textarea>
+</div>
 
-      <div style="height:10px"></div>
-      <div class="pill">최근 방문 10건</div>
+</div>
 
-      <div style="overflow:auto; margin-top:10px;">
-        <table>
-          <thead>
-            <tr>
-              <th style="min-width:98px;">날짜</th>
-              <th style="min-width:90px;">담당자</th>
-              <th style="min-width:120px;">협력사</th>
-              <th style="min-width:160px;">방문자</th>
-              <th style="min-width:90px;">목적</th>
-              <th style="min-width:180px;">내용</th>
-              <th style="min-width:70px;">삭제</th>
-            </tr>
-          </thead>
-          <tbody id="recentTbody">
-            <tr><td colspan="7" class="muted">데이터가 없습니다.</td></tr>
-          </tbody>
-        </table>
-      </div>
+<div class="actions">
+  <button onclick="addVisit()">추가</button>
+  <button class="danger" onclick="clearAll()">전체 삭제</button>
+</div>
+</section>
 
-      <div class="sub" style="margin-top:10px;">
-        ※ 기존 화면에서 확인되던 항목(방문자/방문일정/방문협력사/방문사유/내용)은 동일하게 요약에 반영됩니다. [1](https://kdiwin-my.sharepoint.com/personal/jwffa_kdiwin_com/Documents/2.RPI%ed%8c%80-HTML/RPI%ed%8c%80_%ed%88%ac%ec%9e%90%ec%83%81%ea%b0%81_%ea%b3%84%ec%82%b0%ea%b8%b0_V1.html?web=1)
-      </div>
-    </section>
-  </div>
+<!-- ✅ 최근 방문 -->
+<section class="card">
+<h2>최근 방문 10건</h2>
+<table>
+<thead>
+<tr>
+  <th>날짜</th><th>담당자</th><th>협력사</th>
+  <th>방문자</th><th>목적</th><th>내용</th>
+</tr>
+</thead>
+<tbody id="recentBody"></tbody>
+</table>
+</section>
+
+</div>
 </main>
 
-<div id="toast" class="toast"></div>
-
 <script>
-/* =========================
-   핵심 고정값 (수정 포인트)
-   ========================= */
-const STORAGE_KEY = 'visits_data'; // ✅ 반드시 이 키로 저장/로드 통일
+const STORAGE_KEY='visits_data';
 
-/* =========================
-   유틸
-   ========================= */
-const $ = (id) => document.getElementById(id);
-
-function toast(msg, type='ok'){
-  const t = $('toast');
-  t.className = 'toast ' + (type==='bad' ? 'bad' : 'ok');
-  t.textContent = msg;
-  t.style.display = 'block';
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(()=> t.style.display='none', 2200);
+function load(){
+  return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
 }
-
-function cleanText(v){
-  // &nbsp; / HTML 태그 등 섞였을 때 UI/정렬 오류 방지
-  return String(v ?? '')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g,' ')
-    .trim();
+function save(arr){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(arr));
 }
-
-function safeDateStr(v){
-  // YYYY-MM-DD 형태만 허용(문자열 정렬/필터 안정)
-  const s = cleanText(v);
-  if(!s) return '';
-  // date input은 기본 YYYY-MM-DD, 혹시 다른 포맷이 들어오면 최대한 보정
-  const m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/);
-  if(m){
-    const y=m[1], mm=String(m[2]).padStart(2,'0'), dd=String(m[3]).padStart(2,'0');
-    return `${y}-${mm}-${dd}`;
-  }
-  // 이미 YYYY-MM-DD면 그대로
-  const m2 = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if(m2) return s;
-  return s; // 그래도 반환(표시용). 집계/정렬은 빈값이 아니면 문자열로 처리
+function addVisit(){
+  const v={
+    id:'v_'+Date.now(),
+    vendorName:vendorName.value.trim(),
+    visitDate:visitDate.value,
+    managerName:managerName.value.trim(),
+    visitorName:visitorName.value.trim(),
+    meetingPurpose:meetingPurpose.value,
+    meetingDetailShort:meetingDetailShort.value.trim(),
+    meetingDetail:meetingDetail.value.trim(),
+    createdAt:Date.now()
+  };
+  if(!v.vendorName||!v.visitDate){alert('협력사명/방문일 필수');return;}
+  const arr=load(); arr.push(v); save(arr);
+  render();
 }
-
-function uid(){
-  // 간단한 id 생성
-  return 'v_' + Math.random().toString(16).slice(2) + Date.now().toString(16);
-}
-
-/* =========================
-   데이터 IO
-   ========================= */
-function loadVisits(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const arr = raw ? JSON.parse(raw) : [];
-    if(!Array.isArray(arr)) return [];
-    return arr.map(normalizeVisit).filter(v => v.visitDate && v.vendorName);
-  }catch(e){
-    console.error(e);
-    return [];
+function clearAll(){
+  if(confirm('전체 삭제?')){
+    localStorage.removeItem(STORAGE_KEY); render();
   }
 }
-
-function saveVisits(arr){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-}
-
-function normalizeVisit(v){
-  const obj = Object.assign({}, v);
-  obj.id = cleanText(obj.id) || uid();
-  obj.vendorName = cleanText(obj.vendorName);
-  obj.visitDate = safeDateStr(obj.visitDate);
-  obj.managerName = cleanText(obj.managerName);
-  obj.visitorName = cleanText(obj.visitorName);
-  obj.meetingPurpose = cleanText(obj.meetingPurpose) || '기타';
-  // 상세 내용은 short/long 둘 다 유지 가능
-  obj.meetingDetail = cleanText(obj.meetingDetail);
-  obj.meetingDetailShort = cleanText(obj.meetingDetailShort || obj.meetingDetail);
-  obj.createdAt = Number(obj.createdAt || Date.now());
-  return obj;
-}
-
-/* =========================
-   정렬/집계 (수정 포인트)
-   ========================= */
-function sortByDateDesc(a,b){
-  // ✅ YYYY-MM-DD 문자열 비교는 안전(타임존/파싱 이슈 없음)
-  const d = (b.visitDate||'').localeCompare(a.visitDate||'');
-  if(d!==0) return d;
-  return (b.createdAt||0) - (a.createdAt||0);
-}
-
-function groupCount(arr, keyFn){
-  const m = new Map();
-  arr.forEach(x=>{
-    const k = keyFn(x);
-    if(!k) return;
-    m.set(k, (m.get(k)||0)+1);
-  });
-  return m;
-}
-
-/* =========================
-   UI 렌더
-   ========================= */
 function render(){
-  const all = loadVisits().sort(sortByDateDesc);
-
-  // KPI
-  $('kpiTotal').textContent = all.length.toString();
-  const managers = new Set(all.map(v=>v.managerName).filter(Boolean));
-  $('kpiManagers').textContent = managers.size.toString();
-  const purposes = new Set(all.map(v=>v.meetingPurpose).filter(Boolean));
-  $('kpiPurposes').textContent = purposes.size.toString();
-
-  // datalist 업데이트
-  renderDatalists(all);
-
-  // 최근 1 / 10
-  const recent1 = all.slice(0,1);
-  const recent10 = all.slice(0,10);
-
-  $('summary1').textContent = recent1.length ? recent1.map(formatSummary).join('\n\n') : '-';
-  $('summary10').textContent = recent10.length ? recent10.map(formatSummary).join('\n\n') : '-';
-
-  // 최근 10 테이블
-  renderRecentTable(recent10);
-
-  // 월별 바 차트
-  renderBars('monthlyBars', buildMonthly(all), '월', '건');
-
-  // 목적 분포 바 차트
-  renderBars('purposeBars', buildPurposes(all), '목적', '건');
-}
-
-function formatSummary(v){
-  // 기존 화면에서 쓰던 필드명(방문자/방문일정/방문협력사/방문사유/내용) 형태 유지 [1](https://kdiwin-my.sharepoint.com/personal/jwffa_kdiwin_com/Documents/2.RPI%ed%8c%80-HTML/RPI%ed%8c%80_%ed%88%ac%ec%9e%90%ec%83%81%ea%b0%81_%ea%b3%84%ec%82%b0%ea%b8%b0_V1.html?web=1)
-  const detail = v.meetingDetailShort || v.meetingDetail || '';
-  return [
-    `- 방문자: ${v.visitorName || '-'}`,
-    `- 방문일정: ${v.visitDate || '-'}`,
-    `- 방문협력사: ${v.vendorName || '-'}`,
-    `- 방문사유: ${v.meetingPurpose || '-'}`,
-    `- 내용: ${detail || '-'}`
-  ].join('\n');
-}
-
-function renderRecentTable(list){
-  const tb = $('recentTbody');
-  tb.innerHTML = '';
-  if(!list.length){
-    tb.innerHTML = '<tr><td colspan="7" class="muted">데이터가 없습니다.</td></tr>';
-    return;
-  }
-  list.forEach(v=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${escapeHtml(v.visitDate)}</td>
-      <td>${escapeHtml(v.managerName)}</td>
-      <td><span class="tag">${escapeHtml(v.vendorName)}</span></td>
-      <td>${escapeHtml(v.visitorName)}</td>
-      <td>${escapeHtml(v.meetingPurpose)}</td>
-      <td>${escapeHtml(v.meetingDetailShort || v.meetingDetail)}</td>
-      <td><button class="danger btn-mini" data-del="${escapeAttr(v.id)}">삭제</button></td>
-    `;
-    tb.appendChild(tr);
+  const arr=load();
+  arr.sort((a,b)=>b.visitDate.localeCompare(a.visitDate));
+  recentBody.innerHTML='';
+  arr.slice(0,10).forEach(v=>{
+    recentBody.innerHTML+=`
+      <tr>
+        <td>${v.visitDate}</td>
+        <td>${v.managerName}</td>
+        <td><span class="tag">${v.vendorName}</span></td>
+        <td>${v.visitorName}</td>
+        <td>${v.meetingPurpose}</td>
+        <td>${v.meetingDetailShort||''}</td>
+      </tr>`;
   });
 
-  // delete binding
-  tb.querySelectorAll('button[data-del]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const id = btn.getAttribute('data-del');
-      deleteById(id);
-    });
+  vendorList.innerHTML='';
+  [...new Set(arr.map(x=>x.vendorName))].forEach(x=>{
+    vendorList.innerHTML+=`<option value="${x}">`;
+  });
+  managerList.innerHTML='';
+  [...new Set(arr.map(x=>x.managerName))].forEach(x=>{
+    managerList.innerHTML+=`<option value="${x}">`;
   });
 }
-
-function renderBars(containerId, rows, leftLabel, rightLabel){
-  const el = $(containerId);
-  el.innerHTML = '';
-  if(!rows.length){
-    el.innerHTML = `<div class="muted small">표시할 데이터가 없습니다.</div>`;
-    return;
-  }
-  const max = Math.max(...rows.map(r=>r.count));
-  rows.forEach(r=>{
-    const row = document.createElement('div');
-    row.className = 'barrow';
-    row.innerHTML = `
-      <div class="muted small">${escapeHtml(r.label)}</div>
-      <div class="bar"><i style="width:${(r.count/max*100).toFixed(1)}%"></i></div>
-      <div class="muted small" style="text-align:right">${r.count}${rightLabel}</div>
-    `;
-    el.appendChild(row);
-  });
-}
-
-function buildMonthly(all){
-  const m = groupCount(all, v => (v.visitDate || '').slice(0,7)); // YYYY-MM
-  const rows = [...m.entries()]
-    .sort((a,b)=> a[0].localeCompare(b[0])) // 월은 오름차순이 보기 좋음
-    .map(([label,count])=>({label, count}));
-  return rows;
-}
-
-function buildPurposes(all){
-  const m = groupCount(all, v => v.meetingPurpose || '기타');
-  const rows = [...m.entries()]
-    .sort((a,b)=> b[1]-a[1])
-    .map(([label,count])=>({label, count}));
-  return rows;
-}
-
-function renderDatalists(all){
-  const vendors = new Set(all.map(v=>v.vendorName).filter(Boolean));
-  const managers = new Set(all.map(v=>v.managerName).filter(Boolean));
-
-  const vlist = $('vendorList');
-  vlist.innerHTML = '';
-  [...vendors].sort().forEach(x=>{
-    const opt = document.createElement('option');
-    opt.value = x;
-    vlist.appendChild(opt);
-  });
-
-  const mlist = $('managerList');
-  mlist.innerHTML = '';
-  [...managers].sort().forEach(x=>{
-    const opt = document.createElement('option');
-    opt.value = x;
-    mlist.appendChild(opt);
-  });
-}
-
-function deleteById(id){
-  const all = loadVisits();
-  const next = all.filter(v => v.id !== id);
-  saveVisits(next);
-  toast('삭제 완료');
-  render();
-}
-
-/* =========================
-   이벤트
-   ========================= */
-$('btnAdd').addEventListener('click', ()=>{
-  const rec = normalizeVisit({
-    id: uid(),
-    vendorName: $('vendorName').value,
-    visitDate: $('visitDate').value,
-    managerName: $('managerName').value,
-    visitorName: $('visitorName').value,
-    meetingPurpose: $('meetingPurpose').value,
-    meetingDetailShort: $('meetingDetailShort').value,
-    meetingDetail: $('meetingDetail').value,
-    createdAt: Date.now()
-  });
-
-  if(!rec.vendorName){
-    toast('협력사명을 입력하세요.', 'bad'); return;
-  }
-  if(!rec.visitDate){
-    toast('방문일을 입력하세요.', 'bad'); return;
-  }
-
-  const all = loadVisits();
-  all.push(rec);
-  saveVisits(all);
-
-  toast('추가 완료');
-  // 입력값 일부 유지/초기화
-  $('meetingDetail').value = '';
-  $('meetingDetailShort').value = '';
-  render();
-});
-
-$('btnClearAll').addEventListener('click', ()=>{
-  if(!confirm('정말 전체 삭제하시겠습니까?')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  toast('전체 삭제 완료');
-  render();
-});
-
-$('btnSample').addEventListener('click', ()=>{
-  const sample = [
-    {
-      id: uid(),
-      vendorName: '정민테크',
-      visitDate: safeDateStr(new Date().toISOString().slice(0,10)),
-      managerName: '조현준',
-      visitorName: '김정우,이정수',
-      meetingPurpose: '기타',
-      meetingDetailShort: '공정 라인 확인',
-      meetingDetail: '',
-      createdAt: Date.now()
-    }
-  ].map(normalizeVisit);
-
-  const all = loadVisits();
-  sample.forEach(s=>all.push(s));
-  saveVisits(all);
-  toast('샘플 데이터 추가 완료');
-  render();
-});
-
-$('btnCopy1').addEventListener('click', ()=> copyText($('summary1').textContent));
-$('btnCopy10').addEventListener('click', ()=> copyText($('summary10').textContent));
-
-async function copyText(text){
-  try{
-    await navigator.clipboard.writeText(text);
-    toast('복사 완료');
-  }catch(e){
-    // fallback
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    ta.remove();
-    toast('복사 완료');
-  }
-}
-
-$('btnExport').addEventListener('click', ()=>{
-  const data = loadVisits().sort(sortByDateDesc);
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `visits_data_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-  toast('JSON 내보내기 완료');
-});
-
-$('btnImport').addEventListener('click', ()=>{
-  $('importFile').click();
-});
-
-$('importFile').addEventListener('change', async (e)=>{
-  const file = e.target.files && e.target.files[0];
-  if(!file) return;
-  try{
-    const txt = await file.text();
-    const arr = JSON.parse(txt);
-    if(!Array.isArray(arr)) throw new Error('JSON은 배열 형태여야 합니다.');
-    const normalized = arr.map(normalizeVisit).filter(v=>v.vendorName && v.visitDate);
-    saveVisits(normalized);
-    toast('JSON 가져오기 완료');
-    render();
-  }catch(err){
-    console.error(err);
-    toast('가져오기 실패: JSON 형식을 확인하세요.', 'bad');
-  }finally{
-    e.target.value = '';
-  }
-});
-
-/* =========================
-   XSS 방지용 escape
-   ========================= */
-function escapeHtml(s){
-  return String(s ?? '')
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#039;');
-}
-function escapeAttr(s){
-  return escapeHtml(s).replace(/"/g,'&quot;');
-}
-
-/* =========================
-   최초 렌더
-   ========================= */
 render();
 </script>
+
 </body>
 </html>
