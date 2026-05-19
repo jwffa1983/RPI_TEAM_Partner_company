@@ -51,6 +51,7 @@
       font-size:20px;
       font-weight:800;
       letter-spacing:-.2px;
+      color:#ffffff;
     }
     .sub{
       margin-top:6px;
@@ -287,6 +288,30 @@
     .toast.ok{border-color: rgba(48,209,88,.35)}
     .toast.bad{border-color: rgba(255,92,122,.35)}
     .small{font-size:12px}
+
+    /* ============================================
+       [추가] SharePoint 동기화 상태 배지
+       ============================================ */
+    .sync-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:700;
+      margin-left:6px;
+    }
+    .sync-badge.on{
+      background:rgba(48,209,88,.15);
+      border:1px solid rgba(48,209,88,.35);
+      color:#30d158;
+    }
+    .sync-badge.off{
+      background:rgba(255,92,122,.15);
+      border:1px solid rgba(255,92,122,.35);
+      color:#ff5c7a;
+    }
   </style>
 </head>
 
@@ -296,8 +321,9 @@
     <div>
       <h1>RPI팀 협력사 방문앱</h1>
       <div class="sub">
-        ※ 데이터는 브라우저(LocalStorage)에 저장됩니다. (공용/서버 저장 아님) [1](https://kdiwin-my.sharepoint.com/personal/jwffa_kdiwin_com/Documents/2.RPI%ed%8c%80-HTML/RPI%ed%8c%80_%ed%88%ac%ec%9e%90%ec%83%81%ea%b0%81_%ea%b3%84%ec%82%b0%ea%b8%b0_V1.html?web=1)<br/>
-        <span class="muted">핵심 수정: visits_data 키 통일 + 날짜 내림차순 정렬 후 최근10건/요약 표시</span>
+        ※ 데이터는 브라우저(LocalStorage) + <b>SharePoint List</b>에 동시 저장됩니다.
+        <span id="syncStatus" class="sync-badge on">● SharePoint 연동 ON</span><br/>
+        <span class="muted">v2.0 — SharePoint 자동 동기화 적용 (Power Automate Webhook)</span>
       </div>
     </div>
     <div class="maker">만든이 : RPI팀 김정우 팀장</div>
@@ -426,7 +452,7 @@
       </div>
 
       <div class="sub" style="margin-top:10px;">
-        ※ 기존 화면에서 확인되던 항목(방문자/방문일정/방문협력사/방문사유/내용)은 동일하게 요약에 반영됩니다. [1](https://kdiwin-my.sharepoint.com/personal/jwffa_kdiwin_com/Documents/2.RPI%ed%8c%80-HTML/RPI%ed%8c%80_%ed%88%ac%ec%9e%90%ec%83%81%ea%b0%81_%ea%b3%84%ec%82%b0%ea%b8%b0_V1.html?web=1)
+        ※ 기존 화면에서 확인되던 항목(방문자/방문일정/방문협력사/방문사유/내용)은 동일하게 요약에 반영됩니다.
       </div>
     </section>
   </div>
@@ -438,7 +464,18 @@
 /* =========================
    핵심 고정값 (수정 포인트)
    ========================= */
-const STORAGE_KEY = 'visits_data'; // ✅ 반드시 이 키로 저장/로드 통일
+const STORAGE_KEY = 'visits_data';
+
+/* ============================================
+   [추가] SharePoint 동기화 설정
+   ============================================
+   ★★★ 아래 URL을 Power Automate에서 복사한 HTTP POST URL로 교체하세요 ★★★
+   교체 전에는 동기화가 작동하지 않습니다 (콘솔에 경고만 표시)
+   ============================================ */
+const WEBHOOK_URL = '여기에_Power_Automate_HTTP_POST_URL을_붙여넣기';
+
+// SharePoint 동기화 ON/OFF (URL 미설정 시 자동 OFF)
+const SP_SYNC_ENABLED = (WEBHOOK_URL && !WEBHOOK_URL.includes('여기에_'));
 
 /* =========================
    유틸
@@ -451,11 +488,10 @@ function toast(msg, type='ok'){
   t.textContent = msg;
   t.style.display = 'block';
   clearTimeout(toast._timer);
-  toast._timer = setTimeout(()=> t.style.display='none', 2200);
+  toast._timer = setTimeout(()=> t.style.display='none', 2800);
 }
 
 function cleanText(v){
-  // &nbsp; / HTML 태그 등 섞였을 때 UI/정렬 오류 방지
   return String(v ?? '')
     .replace(/&nbsp;/gi, ' ')
     .replace(/<[^>]*>/g, ' ')
@@ -464,24 +500,77 @@ function cleanText(v){
 }
 
 function safeDateStr(v){
-  // YYYY-MM-DD 형태만 허용(문자열 정렬/필터 안정)
   const s = cleanText(v);
   if(!s) return '';
-  // date input은 기본 YYYY-MM-DD, 혹시 다른 포맷이 들어오면 최대한 보정
-  const m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/);
+  const m = s.match(/^(\d{4})[-\/\.](\d{1,2})[-\/\.](\d{1,2})$/);
   if(m){
     const y=m[1], mm=String(m[2]).padStart(2,'0'), dd=String(m[3]).padStart(2,'0');
     return `${y}-${mm}-${dd}`;
   }
-  // 이미 YYYY-MM-DD면 그대로
   const m2 = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if(m2) return s;
-  return s; // 그래도 반환(표시용). 집계/정렬은 빈값이 아니면 문자열로 처리
+  return s;
 }
 
 function uid(){
-  // 간단한 id 생성
   return 'v_' + Math.random().toString(16).slice(2) + Date.now().toString(16);
+}
+
+/* ============================================
+   [추가] SharePoint 동기화 함수
+   ============================================ */
+async function syncToSharePoint(visitRecord){
+  // URL이 설정되지 않은 경우 건너뛰기
+  if(!SP_SYNC_ENABLED){
+    console.warn('[SP Sync] Webhook URL이 설정되지 않아 동기화를 건너뜁니다.');
+    return { success: false, reason: 'URL_NOT_SET' };
+  }
+
+  // 기존 앱 필드 → SharePoint List 컬럼 매핑
+  const payload = {
+    Company:   visitRecord.vendorName   || '',
+    VisitDate: visitRecord.visitDate    || '',
+    Contact:   visitRecord.managerName  || '',
+    Purpose:   visitRecord.meetingPurpose || '기타',
+    Detail:    visitRecord.meetingDetailShort || visitRecord.meetingDetail || '',
+    Result:    visitRecord.meetingDetail || '',
+    FollowUp:  '',
+    Visitor:   visitRecord.visitorName  || '',
+    Status:    '완료'
+  };
+
+  try{
+    const response = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if(response.ok){
+      console.log('[SP Sync] SharePoint 동기화 성공:', payload.Company, payload.VisitDate);
+      return { success: true };
+    } else {
+      console.error('[SP Sync] 동기화 실패 — HTTP', response.status);
+      return { success: false, reason: 'HTTP_' + response.status };
+    }
+  } catch(error){
+    console.error('[SP Sync] 동기화 오류:', error);
+    return { success: false, reason: error.message };
+  }
+}
+
+/* ============================================
+   [추가] 동기화 상태 배지 업데이트
+   ============================================ */
+function updateSyncBadge(){
+  const badge = $('syncStatus');
+  if(SP_SYNC_ENABLED){
+    badge.className = 'sync-badge on';
+    badge.textContent = '● SharePoint 연동 ON';
+  } else {
+    badge.className = 'sync-badge off';
+    badge.textContent = '● SharePoint 연동 OFF (URL 미설정)';
+  }
 }
 
 /* =========================
@@ -511,7 +600,6 @@ function normalizeVisit(v){
   obj.managerName = cleanText(obj.managerName);
   obj.visitorName = cleanText(obj.visitorName);
   obj.meetingPurpose = cleanText(obj.meetingPurpose) || '기타';
-  // 상세 내용은 short/long 둘 다 유지 가능
   obj.meetingDetail = cleanText(obj.meetingDetail);
   obj.meetingDetailShort = cleanText(obj.meetingDetailShort || obj.meetingDetail);
   obj.createdAt = Number(obj.createdAt || Date.now());
@@ -519,10 +607,9 @@ function normalizeVisit(v){
 }
 
 /* =========================
-   정렬/집계 (수정 포인트)
+   정렬/집계
    ========================= */
 function sortByDateDesc(a,b){
-  // ✅ YYYY-MM-DD 문자열 비교는 안전(타임존/파싱 이슈 없음)
   const d = (b.visitDate||'').localeCompare(a.visitDate||'');
   if(d!==0) return d;
   return (b.createdAt||0) - (a.createdAt||0);
@@ -551,7 +638,7 @@ function render(){
   const purposes = new Set(all.map(v=>v.meetingPurpose).filter(Boolean));
   $('kpiPurposes').textContent = purposes.size.toString();
 
-  // datalist 업데이트
+  // datalist
   renderDatalists(all);
 
   // 최근 1 / 10
@@ -572,7 +659,6 @@ function render(){
 }
 
 function formatSummary(v){
-  // 기존 화면에서 쓰던 필드명(방문자/방문일정/방문협력사/방문사유/내용) 형태 유지 [1](https://kdiwin-my.sharepoint.com/personal/jwffa_kdiwin_com/Documents/2.RPI%ed%8c%80-HTML/RPI%ed%8c%80_%ed%88%ac%ec%9e%90%ec%83%81%ea%b0%81_%ea%b3%84%ec%82%b0%ea%b8%b0_V1.html?web=1)
   const detail = v.meetingDetailShort || v.meetingDetail || '';
   return [
     `- 방문자: ${v.visitorName || '-'}`,
@@ -604,7 +690,6 @@ function renderRecentTable(list){
     tb.appendChild(tr);
   });
 
-  // delete binding
   tb.querySelectorAll('button[data-del]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const id = btn.getAttribute('data-del');
@@ -634,9 +719,9 @@ function renderBars(containerId, rows, leftLabel, rightLabel){
 }
 
 function buildMonthly(all){
-  const m = groupCount(all, v => (v.visitDate || '').slice(0,7)); // YYYY-MM
+  const m = groupCount(all, v => (v.visitDate || '').slice(0,7));
   const rows = [...m.entries()]
-    .sort((a,b)=> a[0].localeCompare(b[0])) // 월은 오름차순이 보기 좋음
+    .sort((a,b)=> a[0].localeCompare(b[0]))
     .map(([label,count])=>({label, count}));
   return rows;
 }
@@ -681,7 +766,7 @@ function deleteById(id){
 /* =========================
    이벤트
    ========================= */
-$('btnAdd').addEventListener('click', ()=>{
+$('btnAdd').addEventListener('click', async ()=>{
   const rec = normalizeVisit({
     id: uid(),
     vendorName: $('vendorName').value,
@@ -701,25 +786,37 @@ $('btnAdd').addEventListener('click', ()=>{
     toast('방문일을 입력하세요.', 'bad'); return;
   }
 
+  // 1) LocalStorage 저장 (기존 로직)
   const all = loadVisits();
   all.push(rec);
   saveVisits(all);
+  toast('추가 완료 (로컬 저장)');
 
-  toast('추가 완료');
-  // 입력값 일부 유지/초기화
+  // 2) [추가] SharePoint 동기화
+  if(SP_SYNC_ENABLED){
+    toast('SharePoint 동기화 중...', 'ok');
+    const result = await syncToSharePoint(rec);
+    if(result.success){
+      toast('추가 완료 + SharePoint 동기화 성공!', 'ok');
+    } else {
+      toast('로컬 저장 완료. SharePoint 동기화 실패 (' + (result.reason || '오류') + ')', 'bad');
+    }
+  }
+
+  // 입력값 초기화
   $('meetingDetail').value = '';
   $('meetingDetailShort').value = '';
   render();
 });
 
 $('btnClearAll').addEventListener('click', ()=>{
-  if(!confirm('정말 전체 삭제하시겠습니까?')) return;
+  if(!confirm('정말 전체 삭제하시겠습니까?\n(주의: LocalStorage만 삭제됩니다. SharePoint 데이터는 유지)')) return;
   localStorage.removeItem(STORAGE_KEY);
-  toast('전체 삭제 완료');
+  toast('전체 삭제 완료 (로컬)');
   render();
 });
 
-$('btnSample').addEventListener('click', ()=>{
+$('btnSample').addEventListener('click', async ()=>{
   const sample = [
     {
       id: uid(),
@@ -737,6 +834,14 @@ $('btnSample').addEventListener('click', ()=>{
   const all = loadVisits();
   sample.forEach(s=>all.push(s));
   saveVisits(all);
+
+  // [추가] 샘플도 SharePoint에 동기화
+  if(SP_SYNC_ENABLED){
+    for(const s of sample){
+      await syncToSharePoint(s);
+    }
+  }
+
   toast('샘플 데이터 추가 완료');
   render();
 });
@@ -749,7 +854,6 @@ async function copyText(text){
     await navigator.clipboard.writeText(text);
     toast('복사 완료');
   }catch(e){
-    // fallback
     const ta = document.createElement('textarea');
     ta.value = text;
     document.body.appendChild(ta);
@@ -808,48 +912,11 @@ function escapeHtml(s){
 function escapeAttr(s){
   return escapeHtml(s).replace(/"/g,'&quot;');
 }
-// ============================================
-// SharePoint 동기화 함수
-// ============================================
-async function syncToSharePoint(visitData) {
-    
-    // ★★★ 아래 URL을 Step 2-6에서 복사한 URL로 교체하세요 ★★★
-    const WEBHOOK_URL = "여기에_복사한_URL을_붙여넣기";
-    
-    try {
-        const response = await fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                Company: visitData.company || '',
-                VisitDate: visitData.date || '',
-                Contact: visitData.contact || '',
-                Purpose: visitData.purpose || '',
-                Detail: visitData.detail || '',
-                Result: visitData.result || '',
-                FollowUp: visitData.followUp || '',
-                Visitor: visitData.visitor || '',
-                Status: visitData.status || '완료'
-            })
-        });
 
-        if (response.ok) {
-            console.log('✅ SharePoint 동기화 성공');
-            return true;
-        } else {
-            console.error('❌ SharePoint 동기화 실패:', response.status);
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ SharePoint 동기화 오류:', error);
-        return false;
-    }
-}
 /* =========================
    최초 렌더
    ========================= */
+updateSyncBadge();
 render();
 </script>
 </body>
